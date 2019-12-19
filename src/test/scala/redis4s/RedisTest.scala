@@ -21,7 +21,7 @@ object RedisTest {
 
   def allocate[A](resource: Resource[IO, A]): A = resource.allocated.unsafeRunSync()._1
 
-  def yoloClient(): RedisClient[IO] = allocate {
+  def newClient(): RedisClient[IO] = allocate {
     Redis4s
       .connection(config)
       .map(Redis4s.simple[IO](_))
