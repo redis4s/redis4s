@@ -3,7 +3,7 @@ package redis4s
 import cats.implicits._
 import cats.effect._
 import fs2.io.tcp.SocketGroup
-import redis4s.free.{Client, RedisSession}
+import redis4s.free.{RedisIO, RedisSession}
 
 import scala.concurrent.ExecutionContext
 
@@ -32,5 +32,5 @@ object RedisTest {
   }
 
   def flushAll(redis: RedisClient[IO]): Unit    = redis.flushAll(false).unsafeRunSync()
-  def flushAll(session: RedisSession[IO]): Unit = session.run(Client.flushAll(false)).unsafeRunSync()
+  def flushAll(session: RedisSession[IO]): Unit = session.run(RedisIO.client.flushAll(false)).unsafeRunSync()
 }

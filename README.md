@@ -8,15 +8,16 @@ package redis4s
 import fs2.Stream
 import cats.implicits._
 import cats.effect._
-import redis4s.free.{Client, RedisIO}
+import redis4s.free.RedisIO
+import RedisIO.client
 
 object Example extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
     val operations: RedisIO[Option[String]] =
-      Client.set("foo", "bar") *>
-        Client.set("bar", "baz") *>
-        Client.get("bar") *>
-        Client.get("foo")
+      client.set("foo", "bar") *>
+        client.set("bar", "baz") *>
+        client.get("bar") *>
+        client.get("foo")
 
     val f = for {
       redis <- Stream.resource(Redis4s[IO])
