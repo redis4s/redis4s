@@ -39,8 +39,5 @@ wartremoverErrors := Nil
 
 testFrameworks += new TestFramework("minitest.runner.Framework")
 
-enablePlugins(PackPlugin)
-packGenerateWindowsBatFile := false
-
 version ~= (_.replace('+', '-'))
 dynver ~= (_.replace('+', '-'))
