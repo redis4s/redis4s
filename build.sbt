@@ -16,7 +16,7 @@ libraryDependencies ++= {
     "org.tpolecat"      %% "natchez-core"                 % "0.0.10",
     "co.fs2"            %% "fs2-io"                       % "2.0.0",
     "co.fs2"            %% "fs2-core"                     % "2.0.0",
-    "org.typelevel"     %% "cats-free"                    % "2.0.0",
+    "org.typelevel"     %% "cats-free"                    % "2.1.0",
     "org.scodec"        %% "scodec-core"                  % "1.11.4",
     "io.chrisdavenport" %% "keypool"                      % "0.2.0",
     "com.codecommit"    %% "cats-effect-testing-minitest" % "0.3.0" % "test",
