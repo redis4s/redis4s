@@ -25,7 +25,7 @@ object FreeSuite extends IOTestSuite {
 
   test("run transaction with watch") {
     RedisTest.flushAll(session)
-    val ops = client.set("foo", "bar") *> client.set("foo", "baz") *> client.get("foo")
+    val ops  = client.set("foo", "bar") *> client.set("foo", "baz") *> client.get("foo")
     val keys = Vector("foo", "bar", "baz")
     for {
       r <- session.transact(ops, keys)

@@ -8,9 +8,8 @@ package object free {
   type RedisIO[A] = FreeApplicative[RequestOp, A]
 
   object RedisIO {
-    def lift[R, P](command: R, codec: CommandCodec.Aux[R, P]): RedisIO[P] = {
+    def lift[R, P](command: R)(implicit codec: Aux[R, P]): RedisIO[P] =
       FreeApplicative.lift(RequestOp.Req(command, codec))
-    }
 
     def pure[A](a: A): RedisIO[A] = FreeApplicative.pure(a)
 
@@ -21,7 +20,7 @@ package object free {
       with ConnectionOps[RedisIO]
       with ServerOps[RedisIO]
       with RunOps[RedisIO] {
-      override def run[R, P](r: R)(implicit codec: Aux[R, P]): RedisIO[P] = RedisIO.lift(r, codec)
+      override def run[R, P](r: R)(implicit codec: Aux[R, P]): RedisIO[P] = RedisIO.lift(r)(codec)
     }
   }
 }
