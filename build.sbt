@@ -12,7 +12,7 @@ parallelExecution in Test := false
 libraryDependencies ++= {
   Seq(
     "org.log4s"         %% "log4s"                        % "1.8.2",
-    "io.chrisdavenport" %% "log4cats-core"                % "1.0.0",
+    "io.chrisdavenport" %% "log4cats-core"                % "1.0.1",
     "org.tpolecat"      %% "natchez-core"                 % "0.0.10",
     "co.fs2"            %% "fs2-io"                       % "2.0.0",
     "co.fs2"            %% "fs2-core"                     % "2.0.0",
@@ -20,7 +20,7 @@ libraryDependencies ++= {
     "org.scodec"        %% "scodec-core"                  % "1.11.4",
     "io.chrisdavenport" %% "keypool"                      % "0.2.0",
     "com.codecommit"    %% "cats-effect-testing-minitest" % "0.3.0" % "test",
-    "io.chrisdavenport" %% "log4cats-slf4j"               % "1.0.0" % "test",
+    "io.chrisdavenport" %% "log4cats-slf4j"               % "1.0.1" % "test",
     "io.monix"          %% "minitest"                     % "2.7.0" % "test",
     "ch.qos.logback"    % "logback-classic"               % "1.2.3" % "test"
   )
