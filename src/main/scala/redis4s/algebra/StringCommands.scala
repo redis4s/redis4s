@@ -38,6 +38,8 @@ object StringCommands {
 
   object Get {
     implicit val codec: Aux[Get, Option[String]] =
-      mk[Get, Option[String]](g => cmd("GET", g.key).result)(m => m.asString.map(_.some) orElse m.asNil.as(none))
+      mk[Get, Option[String]](g => cmd("GET", g.key).result)(
+        _.asOption.traverse(_.asString)
+      )
   }
 }

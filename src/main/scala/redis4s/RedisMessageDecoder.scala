@@ -50,10 +50,10 @@ object RedisMessageDecoder {
       }
     }
 
-    // redis often uses Nil as NULL
-    def nilOption: Option[RedisMessage] = message match {
-      case Arr(None) => none
-      case a         => a.some
+    def asOption: Option[RedisMessage] = message match {
+      case Arr(None)  => none
+      case Bulk(None) => none
+      case a          => a.some
     }
 
     def asString: Either[DecodeError, String] =
