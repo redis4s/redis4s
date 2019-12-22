@@ -1,8 +1,10 @@
 package redis4s.ops
 
+import java.time.Instant
+
 import cats.data.NonEmptyChain
 import redis4s.CommandCodec
-import redis4s.algebra.{ConnectionCommands, KeyCommands, Order, ServerCommands, StreamCommands, StringCommands}
+import redis4s.algebra.{ConnectionCommands, GenericCommands, Order, ServerCommands, StreamCommands, StringCommands}
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration._
@@ -11,28 +13,30 @@ trait RunOps[F[_]] {
   def run[R, P](r: R)(implicit codec: CommandCodec.Aux[R, P]): F[P]
 }
 
-trait KeyOps[F[_]] extends KeyCommands[F] { self: RunOps[F] =>
-  import KeyCommands._
+trait GenericOps[F[_]] extends GenericCommands[F] { self: RunOps[F] =>
+  import GenericCommands._
 
   // format: OFF
   override def `type`(key: String): F[String]                                                                                                                      = run(Type(key))
-  override def del(keys: NonEmptyChain[String]): F[Long]                                                                                                           = run(Del(keys))
-  override def exists(keys: NonEmptyChain[String]): F[Long]                                                                                                        = run(Exists(keys))
-  override def expire(key: String, seconds: Long): F[Boolean]                                                                                                      = run(Expire(key, seconds))
-  override def expireAt(key: String, at: Long): F[Boolean]                                                                                                         = run(ExpireAt(key, at))
+  override def del(key:String, keys: String*): F[Long]                                                                                                             = run(Del(NonEmptyChain(key, keys: _*)))
+  override def exists(key: String, keys: String*): F[Long]                                                                                                         = run(Exists(NonEmptyChain(key, keys: _*)))
+  override def expire(key: String, timeout: FiniteDuration): F[Boolean]                                                                                            = run(Expire(key, timeout.toSeconds))
+  override def expireAt(key: String, timestamp: Instant): F[Boolean]                                                                                               = run(ExpireAt(key, timestamp.getEpochSecond))
   override def keys(pattern: String): F[Seq[String]]                                                                                                               = run(Keys(pattern))
   override def move(key: String, db: Int): F[Boolean]                                                                                                              = run(Move(key, db))
   override def persist(key: String): F[Boolean]                                                                                                                    = run(Persist(key))
-  override def pttl(key: String): F[Long]                                                                                                                          = run(Pttl(key))
+  override def pexpire(key: String, timeout: FiniteDuration): F[Boolean]                                                                                           = run(PExpire(key, timeout.toMillis))
+  override def pexpireAt(key: String, timestamp: Instant): F[Boolean]                                                                                              = run(PExpireAt(key, timestamp.toEpochMilli))
+  override def pttl(key: String): F[Option[Long]]                                                                                                                  = run(Pttl(key))
   override def randomKey(): F[Option[String]]                                                                                                                      = run(RandomKey())
   override def rename(key: String, newkey: String): F[Unit]                                                                                                        = run(Rename(key, newkey))
   override def renamenx(key: String, newkey: String): F[Boolean]                                                                                                   = run(RenameNx(key, newkey))
   override def scan(cursor: String, pattern: Option[String], count: Option[Long], `type`: Option[String]): F[ScanResult]                                           = run(Scan(cursor, pattern, count, `type`))
   override def sort(key: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], order: Option[Order], alpha: Boolean): F[Seq[String]]          = run(Sort(key, by, limit, get, order, alpha))
   override def sortTo(key: String, dest: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], order: Option[Order], alpha: Boolean): F[Long] = run(SortTo(key, dest, by, limit, get, order, alpha))
-  override def touch(keys: NonEmptyChain[String]): F[Long]                                                                                                         = run(Touch(keys))
+  override def touch(key: String, keys: String*): F[Long]                                                                                                          = run(Touch(NonEmptyChain(key, keys:_*)))
   override def ttl(key: String): F[Long]                                                                                                                           = run(Ttl(key))
-  override def unlink(keys: NonEmptyChain[String]): F[Long]                                                                                                        = run(Unlink(keys))
+  override def unlink(key: String, keys: String*): F[Long]                                                                                                         = run(Unlink(NonEmptyChain(key, keys: _*)))
   // format: ON
 }
 

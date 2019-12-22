@@ -15,7 +15,7 @@ package object free {
 
     val client: RedisClient[RedisIO] = new RedisClient[RedisIO]
       with StringOps[RedisIO]
-      with KeyOps[RedisIO]
+      with GenericOps[RedisIO]
       with StreamOps[RedisIO]
       with ConnectionOps[RedisIO]
       with ServerOps[RedisIO]
