@@ -34,8 +34,8 @@ trait GenericOps[F[_]] extends GenericCommands[F] { self: RunOps[F] =>
   override def scan(cursor: String, pattern: Option[String], count: Option[Long], `type`: Option[String]): F[ScanResult]                                           = run(Scan(cursor, pattern, count, `type`))
   override def sort(key: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], order: Option[Order], alpha: Boolean): F[Seq[String]]          = run(Sort(key, by, limit, get, order, alpha))
   override def sortTo(key: String, dest: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], order: Option[Order], alpha: Boolean): F[Long] = run(SortTo(key, dest, by, limit, get, order, alpha))
-  override def touch(key: String, keys: String*): F[Long]                                                                                                          = run(Touch(NonEmptyChain(key, keys:_*)))
-  override def ttl(key: String): F[Long]                                                                                                                           = run(Ttl(key))
+
+  override def ttl(key: String): F[Option[Long]]                                                                                                                           = run(Ttl(key))
   override def unlink(key: String, keys: String*): F[Long]                                                                                                         = run(Unlink(NonEmptyChain(key, keys: _*)))
   // format: ON
 }

@@ -29,8 +29,8 @@ trait GenericCommands[F[_]] {
   def scan(cursor: String, pattern: Option[String], count: Option[Long], `type`: Option[String]): F[GenericCommands.ScanResult]
   def sort(key: String, by: Option[String]=None, limit: Option[(Long, Long)]=None, get: Seq[String]=Nil, order: Option[Order]=None, alpha: Boolean=false): F[Seq[String]]
   def sortTo(key: String, dest: String, by: Option[String]=None, limit: Option[(Long, Long)]=None, get: Seq[String]=Nil, order: Option[Order]=None, alpha: Boolean=false): F[Long]
-  def touch(key: String, keys: String*): F[Long]
-  def ttl(key: String): F[Long]
+
+  def ttl(key: String): F[Option[Long]]
   def unlink(key: String, keys: String*): F[Long]
   // format: ON
 }
@@ -114,7 +114,7 @@ object GenericCommands {
   object RandomKey {
     implicit val codec: Aux[RandomKey, Option[String]] =
       mk[RandomKey, Option[String]](_ => cmd("RANDOMKEY").result) {
-        _.nilOption.traverse(_.asString)
+        _.asOption.traverse(_.asString)
       }
   }
 
@@ -181,8 +181,8 @@ object GenericCommands {
   }
 
   object Ttl {
-    implicit val codec: Aux[Ttl, Long] =
-      mk[Ttl, Long](t => cmd("TTL", t.key).result)(_.asInteger)
+    implicit val codec: Aux[Ttl, Option[Long]] =
+      mk[Ttl, Option[Long]](t => cmd("TTL", t.key).result)(_.asInteger.map(x => if (x >= 0) x.some else none))
   }
 
   object Type {
