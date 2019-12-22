@@ -3,11 +3,11 @@ package redis4s
 import cats.MonadError
 import redis4s.CommandCodec.Aux
 import redis4s.algebra._
-import redis4s.ops.{ConnectionOps, KeyOps, RunOps, ServerOps, StreamOps, StringOps}
+import redis4s.ops.{ConnectionOps, GenericOps, RunOps, ServerOps, StreamOps, StringOps}
 
 trait RedisClient[F[_]]
     extends StringCommands[F]
-    with KeyCommands[F]
+    with GenericCommands[F]
     with StreamCommands[F]
     with ConnectionCommands[F]
     with ServerCommands[F]
@@ -18,7 +18,7 @@ object SimpleClient {
   def wrap[F[_]: MonadError[*[_], Throwable]](conn: Connection[F]): RedisClient[F] =
     new RedisClient[F]
       with StringOps[F]
-      with KeyOps[F]
+      with GenericOps[F]
       with StreamOps[F]
       with ConnectionOps[F]
       with RunOps[F]

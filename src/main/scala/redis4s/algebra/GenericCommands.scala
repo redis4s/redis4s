@@ -1,44 +1,51 @@
 package redis4s.algebra
 
+import java.time.Instant
+
 import cats.data.NonEmptyChain
 import cats.implicits._
 import redis4s.CommandCodec._
 import redis4s.RedisMessageDecoder._
 
 import scala.collection.immutable.Seq
+import scala.concurrent.duration.FiniteDuration
 
-trait KeyCommands[F[_]] {
+trait GenericCommands[F[_]] {
   // format: OFF
-  def del(keys: NonEmptyChain[String]): F[Long]
-  def exists(keys: NonEmptyChain[String]): F[Long]
-  def expire(key: String, seconds: Long): F[Boolean]
-  def expireAt(key: String, at: Long): F[Boolean]
+  def `type`(key: String): F[String]
+  def del(key:String, keys: String*): F[Long]
+  def exists(key: String, keys: String*): F[Long]
+  def expire(key: String, timeout: FiniteDuration): F[Boolean]
+  def expireAt(key: String, timestamp: Instant): F[Boolean]
   def keys(pattern: String): F[Seq[String]]
   def move(key: String, db: Int): F[Boolean]
   def persist(key: String): F[Boolean]
-  def pttl(key: String): F[Long]
+  def pexpire(key: String, timeout: FiniteDuration): F[Boolean]
+  def pexpireAt(key: String, timestamp: Instant): F[Boolean]
+  def pttl(key: String): F[Option[Long]]
   def randomKey(): F[Option[String]]
-  def rename(key: String, newkey: String): F[Unit]
-  def renamenx(key: String, newkey: String): F[Boolean]
-  def scan(cursor: String, pattern: Option[String], count: Option[Long], `type`: Option[String]): F[KeyCommands.ScanResult]
+  def rename(key: String, newKey: String): F[Unit]
+  def renamenx(key: String, newKey: String): F[Boolean]
+  def scan(cursor: String, pattern: Option[String], count: Option[Long], `type`: Option[String]): F[GenericCommands.ScanResult]
   def sort(key: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], order: Option[Order], alpha: Boolean): F[Seq[String]]
   def sortTo(key: String, dest: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], order: Option[Order], alpha: Boolean): F[Long]
-  def touch(keys: NonEmptyChain[String]): F[Long]
+  def touch(key: String, keys: String*): F[Long]
   def ttl(key: String): F[Long]
-  def `type`(key: String): F[String]
-  def unlink(keys: NonEmptyChain[String]): F[Long]
+  def unlink(key: String, keys: String*): F[Long]
   // format: ON
 }
 
-object KeyCommands {
+object GenericCommands {
   // format: OFF
   case class Del(keys: NonEmptyChain[String])
   case class Exists(keys: NonEmptyChain[String])
   case class Expire(key: String, seconds: Long)
-  case class ExpireAt(key: String, at: Long)
+  case class ExpireAt(key: String, timestamp: Long)
   case class Keys(pattern: String)
   case class Move(key: String, db: Int)
   case class Persist(key: String)
+  case class PExpire(key: String, millisecond: Long)
+  case class PExpireAt(key: String, timestampMillis: Long)
   case class Pttl(key: String)
   case class RandomKey()
   case class Rename(key: String, newkey: String)
@@ -71,7 +78,7 @@ object KeyCommands {
 
   object ExpireAt {
     implicit val codec: Aux[ExpireAt, Boolean] =
-      mk[ExpireAt, Boolean](e => cmd("EXPIREAT", e.key, e.at.toString).result)(_.asInteger.map(_ == 1L))
+      mk[ExpireAt, Boolean](e => cmd("EXPIREAT", e.key, e.timestamp.toString).result)(_.asInteger.map(_ == 1L))
   }
 
   object Keys {
@@ -89,15 +96,25 @@ object KeyCommands {
       mk[Persist, Boolean](p => cmd("PERSIST", p.key).result)(_.asInteger.map(_ == 1L))
   }
 
+  object PExpire {
+    implicit val codec: Aux[PExpire, Boolean] =
+      mk[PExpire, Boolean](e => cmd("PEXPIRE", e.key, e.millisecond.toString).result)(_.asInteger.map(_ == 1L))
+  }
+
+  object PExpireAt {
+    implicit val codec: Aux[PExpireAt, Boolean] =
+      mk[PExpireAt, Boolean](e => cmd("PEXPIREAT", e.key, e.timestampMillis.toString).result)(_.asInteger.map(_ == 1L))
+  }
+
   object Pttl {
-    implicit val codec: Aux[Pttl, Long] =
-      mk[Pttl, Long](p => cmd("PTTL", p.key).result)(_.asInteger)
+    implicit val codec: Aux[Pttl, Option[Long]] =
+      mk[Pttl, Option[Long]](p => cmd("PTTL", p.key).result)(_.asInteger.map(x => if (x >= 0) x.some else none))
   }
 
   object RandomKey {
     implicit val codec: Aux[RandomKey, Option[String]] =
-      mk[RandomKey, Option[String]](_ => cmd("RANDOMKEY").result) { m =>
-        m.asString.map(_.some) orElse m.asNil.as(none[String])
+      mk[RandomKey, Option[String]](_ => cmd("RANDOMKEY").result) {
+        _.nilOption.traverse(_.asString)
       }
   }
 
@@ -148,7 +165,7 @@ object KeyCommands {
       mk[SortTo, Long] { s =>
         cmd("SORT")
           .append("BY" -> s.by)
-          .append(s.limit.map { case (o, c) => Seq(o.toString, c.toString) })
+          .append(s.limit.map(x => Seq(x._1.toString, x._2.toString)))
           .append(s.get.flatMap(a => Seq("GET", a)))
           .append(s.order)
           .append(Some("ALPHA").filter(_ => s.alpha))
@@ -157,10 +174,6 @@ object KeyCommands {
           .result
       }(_.asInteger)
   }
-
-  //  SORT key [BY pattern] [LIMIT offset count] [GET pattern [GET pattern ...]] [ASC|DESC] [ALPHA] [STORE destination]
-  //  case class Sort(key: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], ordering: Order, alpha: Boolean)
-  //  case class SortTo(key: String, dest: String, by: Option[String], limit: Option[(Long, Long)], get: Seq[String], ordering: Order, alpha: Boolean)
 
   object Touch {
     implicit val codec: Aux[Touch, Long] =
