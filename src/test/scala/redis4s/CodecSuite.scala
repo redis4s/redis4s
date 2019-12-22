@@ -23,7 +23,6 @@ object CodecSuite extends SimpleTestSuite {
   }
 
   test("should fail on incomplete message") {
-    println(p("*1\r\n*2\r\n$4\r\ntest\r\n").map(_.prettyPrint))
     assert(p("*1\r\n*2\r\n$4\r\ntest\r\n").isLeft)
   }
 
