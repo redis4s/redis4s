@@ -7,7 +7,10 @@ object StreamCommandsSuite extends ClientSuite {
     for {
       _  <- redis.xadd("foo", Map("a" -> "b"))
       xs <- redis.xrange("foo", "-", "+", 10L.some)
-    } yield assert(xs.size == 1 && xs.head.body == Map("a" -> "b"))
+    } yield {
+      assertEquals(xs.size, 1)
+      assertEquals(xs.head.body, Map("a" -> "b"))
+    }
   }
 
   test("perform xgroup create") {
@@ -16,7 +19,12 @@ object StreamCommandsSuite extends ClientSuite {
       _      <- redis.xgroupCreate("foo", "bar", "0", mkstream = true)
       groups <- redis.xinfoGroups("foo")
       g      = groups.head
-    } yield assert(groups.size == 1 && g.pending == 0 && g.name == "bar" && g.consumers == 0)
+    } yield {
+      assertEquals(groups.size, 1)
+      assertEquals(g.pending, 0)
+      assertEquals(g.name, "bar")
+      assertEquals(g.consumers, 0)
+    }
   }
 
   test("perform consume/ack/delete ") {
@@ -35,16 +43,16 @@ object StreamCommandsSuite extends ClientSuite {
       msgids       = msgs.map(_.id)
       acked        <- redis.xack("foo", "grp", msgids.head, msgids.tail: _*)
       deleted      <- redis.xdel("foo", msgids.head, msgids.tail: _*)
-    } yield assert(
-      msgs.size == 2 &&
-        stream.groups == 1 &&
-        stream.length == 2 &&
-        consumers.size == 1 &&
-        consumer.pending == 2 &&
-        acked == 2 &&
-        groupPending.total == 2 &&
-        pendings.size == 2 &&
-        deleted == 2
-    )
+    } yield {
+      assertEquals(msgs.size, 2)
+      assertEquals(stream.groups, 1)
+      assertEquals(stream.length, 2)
+      assertEquals(consumers.size, 1)
+      assertEquals(consumer.pending, 2)
+      assertEquals(acked, 2)
+      assertEquals(groupPending.total, 2)
+      assertEquals(pendings.size, 2)
+      assertEquals(deleted, 2)
+    }
   }
 }
