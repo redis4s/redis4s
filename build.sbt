@@ -19,7 +19,7 @@ libraryDependencies ++= {
     "org.typelevel"     %% "cats-free"                    % "2.1.0",
     "org.scodec"        %% "scodec-core"                  % "1.11.4",
     "io.chrisdavenport" %% "keypool"                      % "0.2.0",
-    "com.codecommit"    %% "cats-effect-testing-minitest" % "0.3.0" % "test",
+    "com.codecommit"    %% "cats-effect-testing-minitest" % "0.4.0" % "test",
     "io.chrisdavenport" %% "log4cats-slf4j"               % "1.0.1" % "test",
     "io.monix"          %% "minitest"                     % "2.7.0" % "test",
     "ch.qos.logback"    % "logback-classic"               % "1.2.3" % "test"
