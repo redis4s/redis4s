@@ -7,7 +7,7 @@ import redis4s.{RedisMessage => RM}
 import scodec.Err
 import scodec.bits.ByteVector
 
-object CodecSuite extends SimpleTestSuite {
+object MessageCodecSuite extends SimpleTestSuite {
   def p(s: String): Either[Err, RedisMessage] = {
     val value = ByteVector(s.getBytes(StandardCharsets.UTF_8)).bits
     RM.codec.decodeValue(value).toEither

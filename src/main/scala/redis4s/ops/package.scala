@@ -3,11 +3,20 @@ package redis4s.ops
 import java.time.Instant
 
 import cats.data.NonEmptyChain
-import redis4s.CommandCodec
+import redis4s.{CommandCodec, RedisClient}
 import redis4s.algebra.{ConnectionCommands, GenericCommands, Order, ServerCommands, StreamCommands, StringCommands}
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration._
+
+trait RedisOps[F[_]]
+    extends RedisClient[F]
+    with StringOps[F]
+    with GenericOps[F]
+    with StreamOps[F]
+    with ConnectionOps[F]
+    with ServerOps[F]
+    with RunOps[F]
 
 trait RunOps[F[_]] {
   def run[R, P](r: R)(implicit codec: CommandCodec.Aux[R, P]): F[P]

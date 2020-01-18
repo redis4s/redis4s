@@ -13,14 +13,9 @@ package object free {
 
     def pure[A](a: A): RedisIO[A] = FreeApplicative.pure(a)
 
-    val client: RedisClient[RedisIO] = new RedisClient[RedisIO]
-      with StringOps[RedisIO]
-      with GenericOps[RedisIO]
-      with StreamOps[RedisIO]
-      with ConnectionOps[RedisIO]
-      with ServerOps[RedisIO]
-      with RunOps[RedisIO] {
-      override def run[R, P](r: R)(implicit codec: Aux[R, P]): RedisIO[P] = RedisIO.lift(r)(codec)
+    val client: RedisClient[RedisIO] = new RedisOps[RedisIO] {
+      override def run[R, P](r: R)(implicit codec: Aux[R, P]): RedisIO[P] =
+        RedisIO.lift(r)(codec)
     }
   }
 }
