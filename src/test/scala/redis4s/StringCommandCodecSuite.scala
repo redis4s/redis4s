@@ -1,6 +1,9 @@
 package redis4s
 
 import cats.implicits._
+import redis4s.algebra.StringCommands.SetModifier
+
+import scala.concurrent.duration._
 
 object StringCommandCodecSuite extends CommandCodecSuite {
   import RedisMessage._
@@ -15,5 +18,11 @@ object StringCommandCodecSuite extends CommandCodecSuite {
     case (req, resp) =>
       assertEquals(req, cmd("GET", "baz"))
       assertEquals(resp, "bar".some.asRight)
+  }
+
+  given("SET")(status("OK"))(_.set("foo", "bar", 50.seconds, SetModifier.XX.some)) {
+    case (req, resp) =>
+      assertEquals(req, cmd("SET", "foo", "bar", "PX", "50000", "XX"))
+      assertEquals(resp, ().asRight)
   }
 }

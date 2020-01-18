@@ -94,6 +94,6 @@ trait StringOps[F[_]] extends StringCommands[F] { self: RunOps[F] =>
 
   // format: OFF
   override def set(key: String, value: String, expire: FiniteDuration=0.seconds, setModifier: Option[SetModifier]=None): F[Unit] = run(Set(key, value, expire, setModifier))
-  override def get(key: String): F[Option[String]]                                                                          = run(Get(key))
+  override def get(key: String): F[Option[String]]                                                                               = run(Get(key))
   // format: ON
 }
