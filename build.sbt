@@ -50,7 +50,7 @@ lazy val redis4s = project.in(file("redis4s"))
         "org.tpolecat"      %% "natchez-core"                 % "0.0.10",
         "co.fs2"            %% "fs2-io"                       % "2.2.2",
         "co.fs2"            %% "fs2-core"                     % "2.2.2",
-        "org.typelevel"     %% "cats-free"                    % "2.1.0",
+        "org.typelevel"     %% "cats-free"                    % "2.1.1",
         "org.scodec"        %% "scodec-core"                  % "1.11.4",
         "io.chrisdavenport" %% "keypool"                      % "0.2.0",
       )
