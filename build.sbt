@@ -3,6 +3,7 @@ lazy val root = project.in(file("."))
   .aggregate(redis4s)
   .aggregate(`redis4s-test`)
   .aggregate(`redis4s-it`)
+  .settings(publish / skip := true)
 
 
 lazy val commonSettings = Seq(
