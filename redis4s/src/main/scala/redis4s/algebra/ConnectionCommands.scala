@@ -23,9 +23,7 @@ object ConnectionCommands {
 
   object Ping {
     implicit val codec: Aux[Ping, Pong] =
-      mk[Ping, Pong](p => cmd("PING").append(p.message).result) { m =>
-        m.asStatus.orElse(m.asString).map(Pong)
-      }
+      mk[Ping, Pong](p => cmd("PING").append(p.message).result) { m => m.asStatus.orElse(m.asString).map(Pong) }
   }
 
   object SwapDb {
