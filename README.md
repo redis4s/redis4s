@@ -3,7 +3,7 @@
 ## Example
 
 ```scala
-import fs2.Stream
+import cats.Show
 import cats.implicits._
 import cats.effect._
 import redis4s.free.RedisIO
@@ -16,12 +16,13 @@ object Example extends IOApp {
         client.set("bar", "baz") *>
         (client.get("bar") product client.get("foo"))
 
-    val f = for {
-      redis <- Stream.resource(Redis4s[IO])
-      _     <- Stream.eval { redis.run(operations) >>= (a => IO(println(a))) }
-    } yield ()
-
-    f.compile.drain.as(ExitCode.Success)
+    Redis4s[IO]
+      .use { session =>
+        session.run(operations) >>= putStrLn
+      }
+      .as(ExitCode.Success)
   }
+
+  def putStrLn[A: Show](a: A): IO[Unit] = IO(println(a.show))
 }
 ```

@@ -198,23 +198,19 @@ object StreamCommands {
 
   object XGroupSetId {
     implicit val codec: Aux[XGroupSetId, Unit] =
-      mk[XGroupSetId, Unit] { x =>
-        cmd("XGROUP", "SETID", x.key, x.group, x.id).result
-      } { _.asStatus.void }
+      mk[XGroupSetId, Unit] { x => cmd("XGROUP", "SETID", x.key, x.group, x.id).result } { _.asStatus.void }
   }
 
   object XGroupDestory {
     implicit val codec: Aux[XGroupDestory, Long] =
-      mk[XGroupDestory, Long] { x =>
-        cmd("XGROUP", "DESTROY", x.key, x.group).result
-      } { _.asInteger }
+      mk[XGroupDestory, Long] { x => cmd("XGROUP", "DESTROY", x.key, x.group).result } { _.asInteger }
   }
 
   object XGroupDelConsumer {
     implicit val codec: Aux[XGroupDelConsumer, Long] =
-      mk[XGroupDelConsumer, Long] { x =>
-        cmd("XGROUP", "DELCONSUMER", x.key, x.group, x.consumer).result
-      } { _.asInteger }
+      mk[XGroupDelConsumer, Long] { x => cmd("XGROUP", "DELCONSUMER", x.key, x.group, x.consumer).result } {
+        _.asInteger
+      }
   }
 
   object XRead {

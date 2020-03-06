@@ -89,7 +89,9 @@ object RedisConnection {
           // response for QUEUED commands
           _ <- resps
                 .slice(1, reqs.size + 1)
-                .traverse_(_.checkError.flatMap(_.checkStatus("QUEUED")).leftMap(TransactionError(_)).liftTo[F]) // check QUEUED commands
+                .traverse_(
+                  _.checkError.flatMap(_.checkStatus("QUEUED")).leftMap(TransactionError(_)).liftTo[F]
+                ) // check QUEUED commands
           // response for EXEC
           as <- resps.last.asOption.fold(TransactionError("Aborted").raiseError[F, Vector[RedisMessage]]) {
                  _.asArrayOfSize(reqs.size).leftMap(TransactionError(_)).liftTo[F]

@@ -27,16 +27,16 @@ object ProtocolSocket {
   ): ProtocolSocket[F, A] = {
     new ProtocolSocket[F, A] {
       val bufferRef: Ref[F, BitVector] = Ref.unsafe[F, BitVector](BitVector.empty)
-      val codec: Codec[A]              = Codec[A]
+      val codec: Codec[A]              = implicitly[Codec[A]]
 
       def readChunk: F[BitVector] = socket.read(readChunkSizeBytes)
 
       override def write(a: A): F[Unit] =
-        Codec[A].encode(a).toTry.toEither.liftTo[F] >>= socket.write
+        codec.encode(a).toTry.toEither.liftTo[F] >>= socket.write
 
       override def writeN(as: Chain[A]): F[Unit] =
         if (as.isEmpty) ().pure[F]
-        else as.traverse(Codec[A].encode(_).toTry.toEither).map(_.fold).liftTo[F] >>= socket.write
+        else as.traverse(codec.encode(_).toTry.toEither).map(_.fold).liftTo[F] >>= socket.write
 
       def readMany(maxCount: Int, bits: BitVector): F[(Vector[A], BitVector)] = {
         val buffer = Vector.newBuilder[A]
