@@ -1,7 +1,7 @@
 package redis4s
 
 import cats.syntax.option._
-import scodec.{Attempt, Codec, DecodeResult, Err, SizeBound}
+import scodec.{Attempt, Codec, DecodeResult, Decoder, Err, SizeBound}
 import scodec.bits.BitVector
 import scodec.codecs.vector
 
@@ -26,7 +26,7 @@ class OptionalVectorCodec[A](countCodec: Codec[Int], valueCodec: Codec[A]) exten
   override def sizeBound: SizeBound = countCodec.sizeBound.atLeast
 
   def decodeN(bits: BitVector, n: Int): Attempt[DecodeResult[Vector[A]]] = {
-    valueCodec.collect[Vector, A](bits, limit = n.some).flatMap { result =>
+    Decoder.decodeCollect[Vector, A](valueCodec, limit = n.some)(bits).flatMap { result =>
       if (result.value.size == n) Attempt.successful(result)
       else
         Attempt.failure(

@@ -1,10 +1,9 @@
-
-lazy val root = project.in(file("."))
+lazy val root = project
+  .in(file("."))
   .aggregate(redis4s)
   .aggregate(`redis4s-test`)
   .aggregate(`redis4s-it`)
   .settings(publish / skip := true)
-
 
 lazy val commonSettings = Seq(
   organization := "com.github.redis4s",
@@ -24,9 +23,8 @@ lazy val commonSettings = Seq(
   wartremoverErrors := Nil,
   testFrameworks += new TestFramework("minitest.runner.Framework"),
   version ~= (_.replace('+', '-')),
-  dynver ~= (_.replace('+', '-')),
+  dynver ~= (_.replace('+', '-'))
 )
-
 
 lazy val testDeps = Seq(
   libraryDependencies ++= {
@@ -34,40 +32,38 @@ lazy val testDeps = Seq(
       "com.codecommit"    %% "cats-effect-testing-minitest" % "0.4.0",
       "io.chrisdavenport" %% "log4cats-slf4j"               % "1.0.1",
       "io.monix"          %% "minitest"                     % "2.7.0",
-      "ch.qos.logback"    % "logback-classic"               % "1.2.3",
+      "ch.qos.logback"    % "logback-classic"               % "1.2.3"
     )
   }
 )
 
-
-lazy val redis4s = project.in(file("redis4s"))
+lazy val redis4s = project
+  .in(file("redis4s"))
   .settings(commonSettings)
   .settings(publish / skip := false)
   .settings(
     libraryDependencies ++= {
       Seq(
-        "org.log4s"         %% "log4s"                        % "1.8.2",
-        "io.chrisdavenport" %% "log4cats-core"                % "1.0.1",
-        "org.tpolecat"      %% "natchez-core"                 % "0.0.10",
-        "co.fs2"            %% "fs2-io"                       % "2.2.2",
-        "co.fs2"            %% "fs2-core"                     % "2.2.2",
-        "org.typelevel"     %% "cats-free"                    % "2.1.1",
-        "org.scodec"        %% "scodec-core"                  % "1.11.6",
-        "io.chrisdavenport" %% "keypool"                      % "0.2.0",
+        "org.log4s"         %% "log4s"         % "1.8.2",
+        "io.chrisdavenport" %% "log4cats-core" % "1.0.1",
+        "org.tpolecat"      %% "natchez-core"  % "0.0.10",
+        "co.fs2"            %% "fs2-io"        % "2.2.2",
+        "co.fs2"            %% "fs2-core"      % "2.2.2",
+        "org.typelevel"     %% "cats-free"     % "2.1.1",
+        "org.scodec"        %% "scodec-core"   % "1.11.7",
+        "io.chrisdavenport" %% "keypool"       % "0.2.0"
       )
     }
   )
 
-
-lazy val `redis4s-test` = project.in(file("redis4s-test"))
+lazy val `redis4s-test` = project
+  .in(file("redis4s-test"))
   .settings(commonSettings)
   .settings(testDeps)
   .dependsOn(redis4s)
 
-
-lazy val `redis4s-it` = project.in(file("redis4s-it"))
+lazy val `redis4s-it` = project
+  .in(file("redis4s-it"))
   .settings(commonSettings)
   .settings(testDeps)
   .dependsOn(redis4s)
-
-
