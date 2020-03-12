@@ -19,3 +19,8 @@ jobs:
     - run: |
         curl https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt > sbt && chmod +x sbt
         ./sbt +test
+        ./sbt +publishM2 && mkdir artifacts && mv ~/.m2/repository ./artifacts/.
+    - uses: actions/upload-artifact@v1
+      with:
+        name: artifacts
+        path: artifacts
