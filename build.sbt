@@ -46,7 +46,7 @@ lazy val redis4s = project
       Seq(
         "org.log4s"         %% "log4s"         % "1.8.2",
         "io.chrisdavenport" %% "log4cats-core" % "1.0.1",
-        "org.tpolecat"      %% "natchez-core"  % "0.0.10",
+        "org.tpolecat"      %% "natchez-core"  % "0.0.11",
         "co.fs2"            %% "fs2-io"        % "2.2.2",
         "co.fs2"            %% "fs2-core"      % "2.2.2",
         "org.typelevel"     %% "cats-free"     % "2.1.1",
