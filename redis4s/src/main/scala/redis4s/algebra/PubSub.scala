@@ -50,50 +50,50 @@ object PubSub {
 
   object Publish {
     implicit val codec: Aux[Publish, Long] =
-      mk[Publish, Long](p => cmd("PUBLISH", p.channel, p.message).result)(_.asInteger)
+      mk[Publish, Long](p => cmd("PUBLISH", p.channel, p.message))(_.asInteger)
   }
 
   object PChannels {
     implicit val codec: Aux[PChannels, Seq[String]] =
-      mk[PChannels, Seq[String]](p => cmd("PUBSUB", "CHANNELS").append(p.pattern).result)(
+      mk[PChannels, Seq[String]](p => cmd("PUBSUB", "CHANNELS").append(p.pattern))(
         _.asArray.flatMap(_.traverse(_.asString))
       )
   }
 
   object PNumSub {
     implicit val codec: Aux[PNumSub, Long] =
-      mk[PNumSub, Long](p => cmd("PUBSUB", "NUMSUB").append(p.channels).result)(_.asInteger)
+      mk[PNumSub, Long](p => cmd("PUBSUB", "NUMSUB").append(p.channels))(_.asInteger)
   }
 
   object PNumPat {
     implicit val codec: Aux[PNumPat, Long] =
-      mk[PNumPat, Long](_ => cmd("PUBSUB", "NUMPAT").result)(_.asInteger)
+      mk[PNumPat, Long](_ => cmd("PUBSUB", "NUMPAT"))(_.asInteger)
   }
 
   object Subscribe {
     implicit val codec: Aux[Subscribe, Nothing] =
-      mk[Subscribe, Nothing](s => cmd("SUBSCRIBE", s.channel).append(s.channels).result)(_ =>
+      mk[Subscribe, Nothing](s => cmd("SUBSCRIBE", s.channel).append(s.channels))(_ =>
         InvalidOperation.`throw`("Subscribe command has no response")
       )
   }
 
   object PSubscribe {
     implicit val codec: Aux[PSubscribe, Nothing] =
-      mk[PSubscribe, Nothing](s => cmd("PSUBSCRIBE", s.pattern).append(s.patterns).result)(_ =>
+      mk[PSubscribe, Nothing](s => cmd("PSUBSCRIBE", s.pattern).append(s.patterns))(_ =>
         InvalidOperation.`throw`("PSubscribe command has no response")
       )
   }
 
   object Unsubscribe {
     implicit val codec: Aux[Unsubscribe, Nothing] =
-      mk[Unsubscribe, Nothing](s => cmd("UNSUBSCRIBE", s.channel).append(s.channels).result)(_ =>
+      mk[Unsubscribe, Nothing](s => cmd("UNSUBSCRIBE", s.channel).append(s.channels))(_ =>
         InvalidOperation.`throw`("Unsubscribe command has no response")
       )
   }
 
   object PUnsubscribe {
     implicit val codec: Aux[PUnsubscribe, Nothing] =
-      mk[PUnsubscribe, Nothing](s => cmd("PUNSUBSCRIBE", s.pattern).append(s.patterns).result)(_ =>
+      mk[PUnsubscribe, Nothing](s => cmd("PUNSUBSCRIBE", s.pattern).append(s.patterns))(_ =>
         InvalidOperation.`throw`("Subscribe command has no response")
       )
   }

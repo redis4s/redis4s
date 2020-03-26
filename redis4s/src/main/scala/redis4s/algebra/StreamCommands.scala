@@ -124,7 +124,7 @@ object StreamCommands {
   object XAck {
     implicit val codec: Aux[XAck, Long] = mk[XAck, Long] {
       case XAck(key, group, id, ids) =>
-        cmd("XACK", key, group, id).append(ids).result
+        cmd("XACK", key, group, id).append(ids)
     }(_.asInteger)
   }
 
@@ -141,7 +141,6 @@ object StreamCommands {
         cmd("XADD", key, id.getOrElse("*"))
           .append(sizeLimit.getOrElse(Chain.empty))
           .append(Chain.fromSeq(pairs))
-          .result
     } { _.asString }
   }
 
@@ -149,7 +148,7 @@ object StreamCommands {
     implicit val codec: Aux[XTrim, Long] =
       mk[XTrim, Long] {
         case XTrim(key, count, option) =>
-          cmd("XTRIM", key, "MAXLEN").append(option).append(count.toString).result
+          cmd("XTRIM", key, "MAXLEN").append(option).append(count.toString)
       } {
         _.asInteger
       }
@@ -159,13 +158,13 @@ object StreamCommands {
     implicit val codec: Aux[XDel, Long] =
       mk[XDel, Long] {
         case XDel(key, id, ids) =>
-          cmd("XDEL", key, id).append(ids).result
+          cmd("XDEL", key, id).append(ids)
       }(_.asInteger)
   }
 
   object XLen {
     implicit val codec: Aux[XLen, Long] =
-      mk[XLen, Long](l => cmd("XLEN", l.key).result)(_.asInteger)
+      mk[XLen, Long](l => cmd("XLEN", l.key))(_.asInteger)
   }
 
   object XRange {
@@ -174,7 +173,6 @@ object StreamCommands {
         val count = r.count.fold(Chain.empty[String])(x => Chain("COUNT", x.toString))
         cmd("XRANGE", r.key, r.start, r.end)
           .append(count)
-          .result
       }(StreamMessage.decodeSeq)
   }
 
@@ -184,7 +182,6 @@ object StreamCommands {
         case XRevRange(key, end, start, count) =>
           cmd("XREVRANGE", key, start, end)
             .append("COUNT" -> count)
-            .result
       }(StreamMessage.decodeSeq)
   }
 
@@ -192,23 +189,23 @@ object StreamCommands {
     implicit val codec: Aux[XGroupCreate, Unit] =
       mk[XGroupCreate, Unit] { x =>
         val mkstream = if (x.mkstream) Chain.one("MKSTREAM") else Chain.empty
-        cmd("XGROUP", "CREATE", x.key, x.group, x.id).append(mkstream).result
+        cmd("XGROUP", "CREATE", x.key, x.group, x.id).append(mkstream)
       } { _.asStatus.void }
   }
 
   object XGroupSetId {
     implicit val codec: Aux[XGroupSetId, Unit] =
-      mk[XGroupSetId, Unit] { x => cmd("XGROUP", "SETID", x.key, x.group, x.id).result } { _.asStatus.void }
+      mk[XGroupSetId, Unit] { x => cmd("XGROUP", "SETID", x.key, x.group, x.id) } { _.asStatus.void }
   }
 
   object XGroupDestory {
     implicit val codec: Aux[XGroupDestory, Long] =
-      mk[XGroupDestory, Long] { x => cmd("XGROUP", "DESTROY", x.key, x.group).result } { _.asInteger }
+      mk[XGroupDestory, Long] { x => cmd("XGROUP", "DESTROY", x.key, x.group) } { _.asInteger }
   }
 
   object XGroupDelConsumer {
     implicit val codec: Aux[XGroupDelConsumer, Long] =
-      mk[XGroupDelConsumer, Long] { x => cmd("XGROUP", "DELCONSUMER", x.key, x.group, x.consumer).result } {
+      mk[XGroupDelConsumer, Long] { x => cmd("XGROUP", "DELCONSUMER", x.key, x.group, x.consumer) } {
         _.asInteger
       }
   }
@@ -222,7 +219,6 @@ object StreamCommands {
           .append("STREAMS")
           .append(streams.map(_._1))
           .append(streams.map(_._2))
-          .result
     }(ReadStreamReply.decodeSeq)
   }
 
@@ -231,13 +227,12 @@ object StreamCommands {
       mk[XPending, Seq[PendingMessage]] { x =>
         cmd("XPENDING", x.key, x.group, x.start, x.end, x.count.toString)
           .append(x.consumer)
-          .result
       }(m => m.asArray.flatMap(_.traverse(PendingMessage.decode)))
   }
 
   object XPendingGroup {
     implicit val codec: Aux[XPendingGroup, PendingSummary] =
-      mk[XPendingGroup, PendingSummary](x => cmd("XPENDING", x.key, x.group).result)(PendingSummary.decode)
+      mk[XPendingGroup, PendingSummary](x => cmd("XPENDING", x.key, x.group))(PendingSummary.decode)
   }
 
   object XReadGroup {
@@ -250,13 +245,12 @@ object StreamCommands {
           .append("STREAMS")
           .append(streams.map(_._1))
           .append(streams.map(_._2))
-          .result
     }(ReadStreamReply.decodeSeq)
   }
 
   object XInfoStream {
     implicit val codec: Aux[XInfoStream, XInfoStreamResponse] =
-      mk[XInfoStream, XInfoStreamResponse](x => cmd("XINFO", "STREAM", x.key).result) {
+      mk[XInfoStream, XInfoStreamResponse](x => cmd("XINFO", "STREAM", x.key)) {
         _.asMap.flatMap { m =>
           (
             m.access("length") >>= (_.asInteger),
@@ -271,7 +265,7 @@ object StreamCommands {
 
   object XInfoGroups {
     implicit val codec: Aux[XInfoGroups, Seq[XInfoGroupResponse]] =
-      mk[XInfoGroups, Seq[XInfoGroupResponse]](x => cmd("XINFO", "GROUPS", x.key).result) {
+      mk[XInfoGroups, Seq[XInfoGroupResponse]](x => cmd("XINFO", "GROUPS", x.key)) {
         _.asArray.flatMap {
           _.traverse {
             _.asMap.flatMap { m =>
@@ -289,7 +283,7 @@ object StreamCommands {
 
   object XInfoConsumers {
     implicit val codec: Aux[XInfoConsumers, Seq[XInfoConsumerResponse]] =
-      mk[XInfoConsumers, Seq[XInfoConsumerResponse]](x => cmd("XINFO", "CONSUMERS", x.key, x.group).result) {
+      mk[XInfoConsumers, Seq[XInfoConsumerResponse]](x => cmd("XINFO", "CONSUMERS", x.key, x.group)) {
         _.asArray.flatMap {
           _.traverse {
             _.asMap.flatMap { m =>

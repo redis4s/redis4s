@@ -24,12 +24,12 @@ object CommandCodec {
       r.checkError.flatMap(codec.decode)
   }
 
-  def mk[R, P0](enc: R => NonEmptyChain[ByteVector])(
+  def mk[R, P0](enc: R => CommandBuilder)(
     dec: RedisMessage => Either[DecodeError, P0]
   ): CommandCodec.Aux[R, P0] =
     new CommandCodec[R] {
       override type P = P0
-      override def encode(r: R): NonEmptyChain[ByteVector]        = enc(r)
+      override def encode(r: R): NonEmptyChain[ByteVector]        = enc(r).result
       override def decode(r: RedisMessage): Either[RedisError, P] = dec(r)
     }
 

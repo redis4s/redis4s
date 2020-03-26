@@ -18,16 +18,16 @@ object ConnectionCommands {
 
   case class Pong(msg: String)
   object Echo {
-    implicit val codec: Aux[Echo, String] = mk[Echo, String](e => cmd("ECHO", e.message).result)(_.asString)
+    implicit val codec: Aux[Echo, String] = mk[Echo, String](e => cmd("ECHO", e.message))(_.asString)
   }
 
   object Ping {
     implicit val codec: Aux[Ping, Pong] =
-      mk[Ping, Pong](p => cmd("PING").append(p.message).result) { m => m.asStatus.orElse(m.asString).map(Pong) }
+      mk[Ping, Pong](p => cmd("PING").append(p.message)) { m => m.asStatus.orElse(m.asString).map(Pong) }
   }
 
   object SwapDb {
     implicit val codec: Aux[SwapDb, Unit] =
-      mk[SwapDb, Unit](s => cmd("SWAPDB", s.index1.toString, s.index2.toString).result)(_.asStatus.void)
+      mk[SwapDb, Unit](s => cmd("SWAPDB", s.index1.toString, s.index2.toString))(_.asStatus.void)
   }
 }

@@ -27,7 +27,6 @@ object StringCommands {
         cmd("SET", s.key, s.value)
           .append("PX" -> s.expire.toMillis.some.filter(_ > 0))
           .append(s.modifier.map(_.toString))
-          .result
       }(_.asStatus.void)
   }
 
@@ -42,7 +41,7 @@ object StringCommands {
 
   object Get {
     implicit val codec: Aux[Get, Option[String]] =
-      mk[Get, Option[String]](g => cmd("GET", g.key).result)(
+      mk[Get, Option[String]](g => cmd("GET", g.key))(
         _.asOption.traverse(_.asString)
       )
   }

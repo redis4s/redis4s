@@ -15,14 +15,12 @@ object ServerCommands {
   case class FlushDB(async: Boolean)
 
   object FlushAll {
-    implicit val codec: Aux[FlushAll, Unit] = mk[FlushAll, Unit] { f =>
-      cmd("FLUSHALL").append("ASYNC".some.filter(_ => f.async)).result
-    }(_.asStatus.as(()))
+    implicit val codec: Aux[FlushAll, Unit] =
+      mk[FlushAll, Unit](f => cmd("FLUSHALL").append("ASYNC".some.filter(_ => f.async)))(_.asStatus.as(()))
   }
 
   object FlushDB {
-    implicit val codec: Aux[FlushDB, Unit] = mk[FlushDB, Unit] { f =>
-      cmd("FLUSHDB").append("ASYNC".some.filter(_ => f.async)).result
-    }(_.asStatus.as(()))
+    implicit val codec: Aux[FlushDB, Unit] =
+      mk[FlushDB, Unit](f => cmd("FLUSHDB").append("ASYNC".some.filter(_ => f.async)))(_.asStatus.as(()))
   }
 }

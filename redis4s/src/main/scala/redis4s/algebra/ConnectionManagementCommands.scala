@@ -17,14 +17,14 @@ object ConnectionManagementCommands {
   case class Select(db: Int)
 
   object Auth {
-    implicit val codec: Aux[Auth, Unit] = mk[Auth, Unit](p => cmd("AUTH", p.password).result)(_.asStatus.void)
+    implicit val codec: Aux[Auth, Unit] = mk[Auth, Unit](p => cmd("AUTH", p.password))(_.asStatus.void)
   }
 
   object Quit {
-    implicit val codec: Aux[Quit, Unit] = mk[Quit, Unit](_ => cmd("QUITE").result)(_.asStatus.void)
+    implicit val codec: Aux[Quit, Unit] = mk[Quit, Unit](_ => cmd("QUITE"))(_.asStatus.void)
   }
 
   object Select {
-    implicit val codec: Aux[Select, Unit] = mk[Select, Unit](s => cmd("SELECT", s.db.toString).result)(_.asStatus.void)
+    implicit val codec: Aux[Select, Unit] = mk[Select, Unit](s => cmd("SELECT", s.db.toString))(_.asStatus.void)
   }
 }
