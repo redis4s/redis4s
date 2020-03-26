@@ -30,7 +30,11 @@ object StringCommands {
           .result
       }(_.asStatus.void)
   }
-  sealed trait SetModifier
+
+  @SuppressWarnings(Array("org.wartremover.warts.ToString"))
+  sealed trait SetModifier {
+    override def toString: String = super.toString
+  }
   object SetModifier {
     case object NX extends SetModifier
     case object XX extends SetModifier

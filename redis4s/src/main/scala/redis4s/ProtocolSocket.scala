@@ -69,6 +69,7 @@ object ProtocolSocket {
           _              <- bufferRef.set(remainder)
         } yield a
 
+      @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
       override def readN(count: Int): F[Chain[A]] = {
         def go(c: Int, bits: BitVector, accu: Chain[A]): F[(Chain[A], BitVector)] = {
           if (c == 0) (accu -> bits).pure[F]

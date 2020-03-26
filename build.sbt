@@ -19,8 +19,19 @@ lazy val commonSettings = Seq(
   addCompilerPlugin("org.typelevel"    % "kind-projector"      % "0.11.0" cross CrossVersion.full),
   addCompilerPlugin("com.olegpy"       %% "better-monadic-for" % "0.3.1"),
   addCompilerPlugin("com.github.cb372" % "scala-typed-holes"   % "0.1.1" cross CrossVersion.full),
-  // wartremoverErrors in (Compile, compile) ++= Warts.unsafe, // .all
-  wartremoverErrors := Nil,
+  wartremoverErrors in (Compile, compile) ++= Warts.allBut(
+    Wart.Any,
+    Wart.AsInstanceOf,
+    Wart.DefaultArguments,
+    Wart.Equals,
+    Wart.FinalCaseClass,
+    Wart.LeakingSealed,
+    Wart.NonUnitStatements,
+    Wart.Nothing,
+    Wart.Null,
+    Wart.Serializable,
+    Wart.TraversableOps,
+  ),
   testFrameworks += new TestFramework("minitest.runner.Framework"),
   version ~= (_.replace('+', '-')),
   dynver ~= (_.replace('+', '-'))

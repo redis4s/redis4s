@@ -73,28 +73,28 @@ object PubSub {
   object Subscribe {
     implicit val codec: Aux[Subscribe, Nothing] =
       mk[Subscribe, Nothing](s => cmd("SUBSCRIBE", s.channel).append(s.channels).result)(_ =>
-        throw InvalidOperation("Subscribe command has no response")
+        InvalidOperation.`throw`("Subscribe command has no response")
       )
   }
 
   object PSubscribe {
     implicit val codec: Aux[PSubscribe, Nothing] =
       mk[PSubscribe, Nothing](s => cmd("PSUBSCRIBE", s.pattern).append(s.patterns).result)(_ =>
-        throw InvalidOperation("PSubscribe command has no response")
+        InvalidOperation.`throw`("PSubscribe command has no response")
       )
   }
 
   object Unsubscribe {
     implicit val codec: Aux[Unsubscribe, Nothing] =
       mk[Unsubscribe, Nothing](s => cmd("UNSUBSCRIBE", s.channel).append(s.channels).result)(_ =>
-        throw InvalidOperation("Unsubscribe command has no response")
+        InvalidOperation.`throw`("Unsubscribe command has no response")
       )
   }
 
   object PUnsubscribe {
     implicit val codec: Aux[PUnsubscribe, Nothing] =
       mk[PUnsubscribe, Nothing](s => cmd("PUNSUBSCRIBE", s.pattern).append(s.patterns).result)(_ =>
-        throw InvalidOperation("Subscribe command has no response")
+        InvalidOperation.`throw`("Subscribe command has no response")
       )
   }
 }

@@ -2,7 +2,10 @@ package redis4s.algebra
 
 import redis4s.CommandCodec
 
-sealed trait Order
+@SuppressWarnings(Array("org.wartremover.warts.ToString"))
+sealed trait Order {
+  override def toString: String = super.toString
+}
 object Order {
   case object ASC  extends Order
   case object DESC extends Order

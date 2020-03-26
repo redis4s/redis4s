@@ -29,8 +29,9 @@ object RedisMessage {
 
   implicit def codec: Codec[RedisMessage] = CodecInstance.codec
 
+  @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   implicit class ops(private val r: RedisMessage) {
-    def prettyPrint: String = {
+    final def prettyPrint: String = {
       r match {
         case Bulk(Some(a)) =>
           a.decodeUtf8.fold(_ => s"Binary(${a.size}))", s => s""""$s"""")

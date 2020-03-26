@@ -14,6 +14,13 @@ case class TransactionError(msg: String, cause: Option[Throwable]) extends Redis
 case class PipelineError(msg: String)                              extends RedisError(msg, null)
 case class ConnectionError(msg: String)                            extends RedisError(msg, null)
 
+@SuppressWarnings(Array("org.wartremover.warts.Throw"))
+object InvalidOperation {
+  @inline
+  def `throw`(msg: String): Nothing = throw InvalidOperation(msg)
+}
+
+@SuppressWarnings(Array("org.wartremover.warts.Overloading"))
 object TransactionError {
   def apply(cause: Throwable): TransactionError              = TransactionError("Aborted", cause.some)
   def apply(msg: String): TransactionError                   = TransactionError(msg, none)

@@ -41,6 +41,7 @@ object Redis4sConfig {
     } yield sg
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.Overloading"))
   def apply[F[_]: Sync: ContextShift](host: String, port: Int): Redis4sConfig[F] =
     default[F].copy(host = host, port = port)
 }
@@ -56,6 +57,7 @@ object Redis4sPoolConfig {
 
 object Redis4s {
 
+  @SuppressWarnings(Array("org.wartremover.warts.Overloading"))
   def apply[F[_]: ConcurrentEffect: ContextShift: Timer]: Resource[F, RedisSession[F]] =
     apply[F](Redis4sConfig.default[F], Redis4sPoolConfig.default)
 
