@@ -73,12 +73,12 @@ object GenericCommands {
 
   object Expire {
     implicit val codec: Aux[Expire, Boolean] =
-      mk[Expire, Boolean](e => cmd("EXPIRE", e.key, e.seconds.toString))(_.asInteger.map(_ == 1L))
+      mk[Expire, Boolean](e => cmd("EXPIRE", e.key, e.seconds.toString))(_.asBoolean)
   }
 
   object ExpireAt {
     implicit val codec: Aux[ExpireAt, Boolean] =
-      mk[ExpireAt, Boolean](e => cmd("EXPIREAT", e.key, e.timestamp.toString))(_.asInteger.map(_ == 1L))
+      mk[ExpireAt, Boolean](e => cmd("EXPIREAT", e.key, e.timestamp.toString))(_.asBoolean)
   }
 
   object Keys {
@@ -88,22 +88,22 @@ object GenericCommands {
 
   object Move {
     implicit val codec: Aux[Move, Boolean] =
-      mk[Move, Boolean](m => cmd("MOVE", m.key, m.db.toString))(_.asInteger.map(_ == 1L))
+      mk[Move, Boolean](m => cmd("MOVE", m.key, m.db.toString))(_.asBoolean)
   }
 
   object Persist {
     implicit val codec: Aux[Persist, Boolean] =
-      mk[Persist, Boolean](p => cmd("PERSIST", p.key))(_.asInteger.map(_ == 1L))
+      mk[Persist, Boolean](p => cmd("PERSIST", p.key))(_.asBoolean)
   }
 
   object PExpire {
     implicit val codec: Aux[PExpire, Boolean] =
-      mk[PExpire, Boolean](e => cmd("PEXPIRE", e.key, e.millisecond.toString))(_.asInteger.map(_ == 1L))
+      mk[PExpire, Boolean](e => cmd("PEXPIRE", e.key, e.millisecond.toString))(_.asBoolean)
   }
 
   object PExpireAt {
     implicit val codec: Aux[PExpireAt, Boolean] =
-      mk[PExpireAt, Boolean](e => cmd("PEXPIREAT", e.key, e.timestampMillis.toString))(_.asInteger.map(_ == 1L))
+      mk[PExpireAt, Boolean](e => cmd("PEXPIREAT", e.key, e.timestampMillis.toString))(_.asBoolean)
   }
 
   object Pttl {
@@ -125,7 +125,7 @@ object GenericCommands {
 
   object RenameNx {
     implicit val codec: Aux[RenameNx, Boolean] =
-      mk[RenameNx, Boolean](r => cmd("RENAMENX", r.key, r.newkey))(_.asInteger.map(_ == 1L))
+      mk[RenameNx, Boolean](r => cmd("RENAMENX", r.key, r.newkey))(_.asBoolean)
   }
 
   object Scan {

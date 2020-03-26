@@ -92,5 +92,9 @@ object CommandCodec {
         case (name, opt) =>
           opt.fold(Chain.empty[ByteVector])(a => toArgs(a).prepend(name.bv))
       }
+    implicit def pair[A: Appendable]: Appendable[(A, A)] =
+      mk[(A, A)] {
+        case (a, b) => toArgs(a) ++ toArgs(b)
+      }
   }
 }

@@ -34,6 +34,9 @@ object RedisMessageDecoder {
     def asInteger: Either[DecodeError, Long] =
       matchType("Integer") { case Integer(id) => id }
 
+    def asBoolean: Either[DecodeError, Boolean] =
+      asInteger.map(_ == 1L)
+
     def asBytes: Either[DecodeError, ByteVector] =
       matchType("NonNull Bulk") { case Bulk(Some(value)) => value }
 

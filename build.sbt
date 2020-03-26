@@ -19,19 +19,7 @@ lazy val commonSettings = Seq(
   addCompilerPlugin("org.typelevel"    % "kind-projector"      % "0.11.0" cross CrossVersion.full),
   addCompilerPlugin("com.olegpy"       %% "better-monadic-for" % "0.3.1"),
   addCompilerPlugin("com.github.cb372" % "scala-typed-holes"   % "0.1.1" cross CrossVersion.full),
-  wartremoverErrors in (Compile, compile) ++= Warts.allBut(
-    Wart.Any,
-    Wart.AsInstanceOf,
-    Wart.DefaultArguments,
-    Wart.Equals,
-    Wart.FinalCaseClass,
-    Wart.LeakingSealed,
-    Wart.NonUnitStatements,
-    Wart.Nothing,
-    Wart.Null,
-    Wart.Serializable,
-    Wart.TraversableOps,
-  ),
+  wartremoverErrors := Nil,
   testFrameworks += new TestFramework("minitest.runner.Framework"),
   version ~= (_.replace('+', '-')),
   dynver ~= (_.replace('+', '-'))
@@ -65,6 +53,22 @@ lazy val redis4s = project
         "io.chrisdavenport" %% "keypool"       % "0.2.0"
       )
     }
+  )
+  .settings(
+    wartremoverErrors in (Compile, compile) ++= Warts.allBut(
+      Wart.Any,
+      Wart.AsInstanceOf,
+      Wart.DefaultArguments,
+      Wart.Equals,
+      Wart.FinalCaseClass,
+      Wart.LeakingSealed,
+      Wart.NonUnitStatements,
+      Wart.Nothing,
+      Wart.Null,
+      Wart.Serializable,
+      Wart.StringPlusAny,
+      Wart.TraversableOps,
+    )
   )
 
 lazy val `redis4s-test` = project
