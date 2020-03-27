@@ -21,9 +21,9 @@ object Connection {
     C: CommandCodec.Aux[R, P]
   ): F[P] = {
     val request = C.encodeCommand(r)
-    logger.trace(s"-> ${request.prettyPrint}")
+    logger.trace(s"-> ${request.show}")
     conn.execute(request).flatMap { m =>
-      logger.trace(s"<- ${m.prettyPrint}")
+      logger.trace(s"<- ${m.show}")
       m.checkError.flatMap(C.decodeResponse).liftTo[F]
     }
   }

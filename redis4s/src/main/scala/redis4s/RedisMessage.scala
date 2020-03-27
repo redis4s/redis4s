@@ -1,5 +1,6 @@
 package redis4s
 
+import cats.Show
 import cats.syntax.all._
 import scodec._
 import scodec.bits._
@@ -29,6 +30,9 @@ object RedisMessage {
 
   implicit def codec: Codec[RedisMessage] = CodecInstance.codec
 
+  implicit val show: Show[RedisMessage] = Show.show[RedisMessage](_.prettyPrint)
+
+  // stack-safety?
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   implicit class ops(private val r: RedisMessage) {
     final def prettyPrint: String = {
@@ -49,7 +53,9 @@ object RedisMessage {
 object CodecInstance extends CodecInstance
 
 trait CodecInstance {
-  val eof              = "\r\n".bv
+  import RedisMessage.{Status, Error, Integer, Bulk, Arr}
+
+  val eof: ByteVector = "\r\n".bv
   val EOF: Codec[Unit] = constant(eof)
 
   val longStr: Codec[Long] = {
@@ -61,22 +67,22 @@ trait CodecInstance {
   val sizePrefix: Codec[Long]     = variableLong.xmap[Long](_ * 8, _ / 8) // nBytes to nBits
   val variableSizeInt: Codec[Int] = variableLong.xmap[Int](_.toInt, _.toLong)
 
-  val statusCodec: Codec[RedisMessage.Status] =
-    VariableSizeDelimited(EOF, ascii, 8L).xmap[RedisMessage.Status](RedisMessage.status, _.message)
+  val statusCodec: Codec[Status] =
+    VariableSizeDelimited(EOF, ascii, 8L).xmap[Status](RedisMessage.status, _.message)
 
   // hope no one would produce an error with non-ascii value
-  val errorCodec: Codec[RedisMessage.Error] = VariableSizeDelimited(EOF, ascii, 8L)
-    .xmap[RedisMessage.Error](RedisMessage.Error, _.message)
+  val errorCodec: Codec[Error] = VariableSizeDelimited(EOF, ascii, 8L)
+    .xmap[Error](Error, _.message)
 
-  val integerCodec: Codec[RedisMessage.Integer] = variableLong.xmap[RedisMessage.Integer](RedisMessage.Integer, _.i)
+  val integerCodec: Codec[Integer] = variableLong.xmap[Integer](Integer, _.i)
 
-  val bulkCodec: Codec[RedisMessage.Bulk] =
+  val bulkCodec: Codec[Bulk] =
     OptionalVariableSizeCodec[ByteVector](sizePrefix, bytes, EOF)
-      .xmap[RedisMessage.Bulk](RedisMessage.Bulk, _.message)
+      .xmap[Bulk](Bulk, _.message)
 
-  val arrCodec: Codec[RedisMessage.Arr] = Codec.lazily( // to handle this recursive codec
+  val arrCodec: Codec[Arr] = Codec.lazily( // to handle this recursive codec
     OptionalVectorCodec[RedisMessage](variableSizeInt, codec)
-      .xmap(RedisMessage.Arr, _.message)
+      .xmap(Arr, _.message)
   )
 
   val codec: Codec[RedisMessage] = discriminated[RedisMessage]

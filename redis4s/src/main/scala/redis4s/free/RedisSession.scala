@@ -38,14 +38,15 @@ object RedisSession {
             val lifted    = log.getConst.toVector
             val requests  = lifted.map(_.request)
             val callbacks = lifted.map(_.complete)
-            if (logger.isTraceEnabled)
-              requests.foreach(r => logger.trace(s"-> [P ${requests.size}] ${r.prettyPrint}"))
+            if (logger.isTraceEnabled) {
+              requests.foreach(r => logger.trace(s"-> [P ${requests.size}] ${r.show}"))
+            }
             conn
               .pipeline(requests)
               .flatMap(
                 _.zip(callbacks).traverse_ {
                   case (m, f) =>
-                    logger.trace(s"<- [P ${requests.size}] ${m.prettyPrint}")
+                    logger.trace(s"<- [P ${requests.size}] ${m.show}")
                     f(m)
                 }
               ) >> fa
