@@ -55,7 +55,7 @@ object CodecInstance extends CodecInstance
 trait CodecInstance {
   import RedisMessage.{Status, Error, Integer, Bulk, Arr}
 
-  val eof: ByteVector = "\r\n".bv
+  val eof: ByteVector  = "\r\n".bv
   val EOF: Codec[Unit] = constant(eof)
 
   val longStr: Codec[Long] = {
