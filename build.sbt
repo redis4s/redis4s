@@ -30,7 +30,7 @@ lazy val testDeps = Seq(
     Seq(
       "com.codecommit"    %% "cats-effect-testing-minitest" % "0.4.0",
       "io.chrisdavenport" %% "log4cats-slf4j"               % "1.0.1",
-      "io.monix"          %% "minitest"                     % "2.8.1",
+      "io.monix"          %% "minitest"                     % "2.8.2",
       "ch.qos.logback"    % "logback-classic"               % "1.2.3"
     )
   }
