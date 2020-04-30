@@ -1,6 +1,4 @@
-package redis4s.algebra
-
-import redis4s.CommandCodec
+package redis4s
 
 sealed trait Order
 object Order {

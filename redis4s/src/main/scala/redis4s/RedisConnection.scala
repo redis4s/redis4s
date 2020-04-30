@@ -5,7 +5,6 @@ import cats.data.Chain
 import cats.implicits._
 import fs2.{Chunk, Stream}
 import redis4s.RedisMessageDecoder._
-import redis4s.algebra.ConnectionManagementCommands
 
 trait Connection[F[_]] {
   def execute(req: RedisMessage): F[RedisMessage]

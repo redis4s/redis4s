@@ -1,23 +1,21 @@
-package redis4s.ops
+package redis4s
 
 // scalafmt: { maxColumn = 200 }
 
 import java.time.Instant
 
 import cats.data.NonEmptyChain
-import redis4s.{CommandCodec, RedisClient}
-import redis4s.algebra.{ConnectionCommands, GenericCommands, Order, ServerCommands, StreamCommands, StringCommands, SetModifier, BitOps}
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 
-trait RedisOps[F[_]] extends RedisClient[F] with StringOps[F] with GenericOps[F] with StreamOps[F] with ConnectionOps[F] with ServerOps[F] with RunOps[F]
+trait RedisC[F[_]] extends RedisClient[F] with StringC[F] with GenericC[F] with StreamC[F] with ConnectionC[F] with ServerC[F] with RunC[F]
 
-trait RunOps[F[_]] {
+trait RunC[F[_]] {
   def run[R, P](r: R)(implicit codec: CommandCodec.Aux[R, P]): F[P]
 }
 
-trait GenericOps[F[_]] extends GenericCommands[F] { self: RunOps[F] =>
+trait GenericC[F[_]] extends GenericCommands[F] { self: RunC[F] =>
   import GenericCommands._
 
   override def `type`(key: String): F[String]                            = run(Type(key))
@@ -62,7 +60,7 @@ trait GenericOps[F[_]] extends GenericCommands[F] { self: RunOps[F] =>
   override def unlink(key: String, keys: String*): F[Long] = run(Unlink(NonEmptyChain(key, keys: _*)))
 }
 
-trait StreamOps[F[_]] extends StreamCommands[F] { self: RunOps[F] =>
+trait StreamC[F[_]] extends StreamCommands[F] { self: RunC[F] =>
   import StreamCommands._
 
   override def xack(key: String, group: String, id: String, ids: String*): F[Long] = run(XAck(key, group, id, ids.toVector))
@@ -112,7 +110,7 @@ trait StreamOps[F[_]] extends StreamCommands[F] { self: RunOps[F] =>
     run(XTrim(key, count, option))
 }
 
-trait ConnectionOps[F[_]] extends ConnectionCommands[F] { self: RunOps[F] =>
+trait ConnectionC[F[_]] extends ConnectionCommands[F] { self: RunC[F] =>
   import ConnectionCommands._
 
   override def echo(message: String): F[String]          = run(Echo(message))
@@ -120,14 +118,14 @@ trait ConnectionOps[F[_]] extends ConnectionCommands[F] { self: RunOps[F] =>
   override def swapDb(index1: Int, index2: Int): F[Unit] = run(SwapDb(index1, index2))
 }
 
-trait ServerOps[F[_]] extends ServerCommands[F] { self: RunOps[F] =>
+trait ServerC[F[_]] extends ServerCommands[F] { self: RunC[F] =>
   import ServerCommands._
 
   override def flushAll(async: Boolean): F[Unit] = run(FlushAll(async))
   override def flushDB(async: Boolean): F[Unit]  = run(FlushDB(async))
 }
 
-trait StringOps[F[_]] extends StringCommands[F] { self: RunOps[F] =>
+trait StringC[F[_]] extends StringCommands[F] { self: RunC[F] =>
   import StringCommands._
 
   override def set(

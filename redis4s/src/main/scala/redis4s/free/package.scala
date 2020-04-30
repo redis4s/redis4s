@@ -2,7 +2,6 @@ package redis4s
 
 import cats.free._
 import redis4s.CommandCodec.Aux
-import redis4s.ops._
 
 package object free {
   type RedisIO[A] = FreeApplicative[RequestOp, A]
@@ -13,7 +12,7 @@ package object free {
 
     def pure[A](a: A): RedisIO[A] = FreeApplicative.pure(a)
 
-    val client: RedisClient[RedisIO] = new RedisOps[RedisIO] {
+    val client: RedisClient[RedisIO] = new RedisC[RedisIO] {
       override def run[R, P](r: R)(implicit codec: Aux[R, P]): RedisIO[P] =
         RedisIO.lift(r)(codec)
     }

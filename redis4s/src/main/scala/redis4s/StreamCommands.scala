@@ -1,11 +1,10 @@
-package redis4s.algebra
+package redis4s
 
 import cats.data.Chain
 import cats.implicits._
 import redis4s.CommandCodec._
-import redis4s.{DecodeError, RedisMessage}
 import redis4s.RedisMessageDecoder._
-import redis4s.algebra.StreamCommands.{XInfoConsumerResponse, XInfoGroupResponse, XInfoStreamResponse}
+import redis4s.StreamCommands.{XInfoConsumerResponse, XInfoGroupResponse, XInfoStreamResponse}
 import redis4s.internal.ops.chainOps
 
 import scala.collection.immutable.Seq

@@ -1,8 +1,7 @@
-package redis4s.algebra
+package redis4s
 
 import cats.implicits._
 import fs2.Stream
-import redis4s.{DecodeError, InvalidOperation, RedisMessage}
 import redis4s.CommandCodec._
 import redis4s.RedisMessageDecoder._
 

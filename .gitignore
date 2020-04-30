@@ -7,3 +7,4 @@ target/
 .bloop
 out/
 dumps/
+project/metals.sbt

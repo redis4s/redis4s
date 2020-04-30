@@ -1,4 +1,4 @@
-package redis4s.algebra
+package redis4s
 
 import cats.data.{Chain, NonEmptyChain}
 import cats.implicits._
