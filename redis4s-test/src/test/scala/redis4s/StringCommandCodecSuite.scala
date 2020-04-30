@@ -1,7 +1,6 @@
 package redis4s
 
 import cats.implicits._
-import redis4s.algebra.SetModifier
 
 import scala.concurrent.duration._
 

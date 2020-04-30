@@ -1,9 +1,9 @@
 package redis4s.free
 
-import cats.data.{Chain, Const, Tuple2K}
+import cats.data.Tuple2K
 import cats.implicits._
 import cats.effect._
-import cats.{Applicative, ~>}
+import cats.~>
 import redis4s.{Connection, RedisMessage}
 
 trait RedisSession[F[_]] {
@@ -13,21 +13,13 @@ trait RedisSession[F[_]] {
 
 object RedisSession {
   private val logger = org.log4s.getLogger
-  logger.info("TODO")
 
   def apply[F[_]](implicit ev: RedisSession[F]): ev.type = ev
 
   def create[F[_]: Concurrent](conn: Connection[F]): RedisSession[F] = new RedisSession[F] {
     import FreeIO._
 
-    implicit val applicativeNat: Applicative[Tuple2K[RequestLog[F, *], F, *]] = Tuple2K
-      .catsDataApplicativeForTuple2K(
-        implicitly[Applicative[Const[Chain[Lift[F, Unit]], *]]],
-        implicitly[Applicative[F]]
-      )
-      .asInstanceOf[Applicative[Tuple2K[RequestLog[F, *], F, *]]]
-
-    val nat: IOOp[F, *] ~> Tuple2K[RequestLog[F, *], F, *] = logNat[F] and ioNat[F]
+    val nat: RCmd[F, *] ~> Tuple2K[RCollect[F, *], F, *] = collectNat[F] and ioNat[F]
 
     override def run[A](a: RedisIO[A]): F[A] = {
       Concurrent[F]

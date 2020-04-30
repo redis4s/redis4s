@@ -2,7 +2,6 @@ package redis4s
 
 import cats.effect.{IO, Timer}
 import cats.implicits._
-import redis4s.algebra.BitOps
 
 import scala.concurrent.duration._
 

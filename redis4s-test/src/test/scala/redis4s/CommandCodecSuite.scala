@@ -4,7 +4,6 @@ import minitest.SimpleTestSuite
 import redis4s.CommandCodec.Aux
 
 trait CommandCodecSuite extends SimpleTestSuite {
-  import redis4s.ops._
   type Check[A] = (RedisMessage.Arr, Either[RedisError, A])
 
   def newClient(reply: RedisMessage): RedisClient[Check] = new RedisC[Check] {

@@ -67,7 +67,7 @@ lazy val redis4s = project
       Wart.Null,
       Wart.Serializable,
       Wart.StringPlusAny,
-      Wart.TraversableOps,
+      Wart.TraversableOps
     )
   )
 
