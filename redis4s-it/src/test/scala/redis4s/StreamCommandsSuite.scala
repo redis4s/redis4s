@@ -18,7 +18,7 @@ object StreamCommandsSuite extends ClientSuite {
     for {
       _      <- redis.xgroupCreate("foo", "bar", "0", mkstream = true)
       groups <- redis.xinfoGroups("foo")
-      g      = groups.head
+      g       = groups.head
     } yield {
       assertEquals(groups.size, 1)
       assertEquals(g.pending, 0)
@@ -38,9 +38,9 @@ object StreamCommandsSuite extends ClientSuite {
       consumers    <- redis.xinfoConsumers("foo", "grp")
       groupPending <- redis.xpendingGroup("foo", "grp")
       pendings     <- redis.xpending("foo", "grp", "-", "+", 100, none)
-      consumer     = consumers.head
-      msgs         = streamMsgs.toVector.flatMap(_.messags)
-      msgids       = msgs.map(_.id)
+      consumer      = consumers.head
+      msgs          = streamMsgs.toVector.flatMap(_.messags)
+      msgids        = msgs.map(_.id)
       acked        <- redis.xack("foo", "grp", msgids.head, msgids.tail: _*)
       deleted      <- redis.xdel("foo", msgids.head, msgids.tail: _*)
     } yield {

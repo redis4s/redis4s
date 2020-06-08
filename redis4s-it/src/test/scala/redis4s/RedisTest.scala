@@ -21,15 +21,17 @@ object RedisTest {
 
   def allocate[A](resource: Resource[IO, A]): A = resource.allocated.unsafeRunSync()._1
 
-  def newClient(): RedisClient[IO] = allocate {
-    Redis4s
-      .connection(config)
-      .map(Redis4s.simple[IO](_))
-  }
+  def newClient(): RedisClient[IO] =
+    allocate {
+      Redis4s
+        .connection(config)
+        .map(Redis4s.simple[IO](_))
+    }
 
-  def newSession(): RedisSession[IO] = allocate {
-    Redis4s[IO](config, Redis4sPoolConfig.default)
-  }
+  def newSession(): RedisSession[IO] =
+    allocate {
+      Redis4s[IO](config, Redis4sPoolConfig.default)
+    }
 
   def flushAll(redis: RedisClient[IO]): Unit    = redis.flushAll(false).unsafeRunSync()
   def flushAll(session: RedisSession[IO]): Unit = session.run(RedisIO.client.flushAll(false)).unsafeRunSync()

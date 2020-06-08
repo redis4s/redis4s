@@ -37,7 +37,7 @@ trait GenericC[F[_]] extends GenericCommands[F] { self: RunC[F] =>
     pattern: Option[String],
     count: Option[Long],
     `type`: Option[String]
-  ): F[ScanResult] = run(Scan(cursor, pattern, count, `type`))
+  ): F[ScanResult]                                                       = run(Scan(cursor, pattern, count, `type`))
   override def sort(
     key: String,
     by: Option[String],
@@ -45,7 +45,7 @@ trait GenericC[F[_]] extends GenericCommands[F] { self: RunC[F] =>
     get: Seq[String],
     order: Option[Order],
     alpha: Boolean
-  ): F[Seq[String]] = run(Sort(key, by, limit, get, order, alpha))
+  ): F[Seq[String]]                                                      = run(Sort(key, by, limit, get, order, alpha))
   override def sortTo(
     key: String,
     dest: String,
@@ -54,7 +54,7 @@ trait GenericC[F[_]] extends GenericCommands[F] { self: RunC[F] =>
     get: Seq[String],
     order: Option[Order],
     alpha: Boolean
-  ): F[Long] = run(SortTo(key, dest, by, limit, get, order, alpha))
+  ): F[Long]                                                             = run(SortTo(key, dest, by, limit, get, order, alpha))
 
   override def ttl(key: String): F[Option[Long]]           = run(Ttl(key))
   override def unlink(key: String, keys: String*): F[Long] = run(Unlink(NonEmptyChain(key, keys: _*)))
@@ -63,23 +63,23 @@ trait GenericC[F[_]] extends GenericCommands[F] { self: RunC[F] =>
 trait StreamC[F[_]] extends StreamCommands[F] { self: RunC[F] =>
   import StreamCommands._
 
-  override def xack(key: String, group: String, id: String, ids: String*): F[Long] = run(XAck(key, group, id, ids.toVector))
+  override def xack(key: String, group: String, id: String, ids: String*): F[Long]                                                = run(XAck(key, group, id, ids.toVector))
   override def xadd(
     key: String,
     values: Map[String, String],
     id: Option[String],
     maxSizeLimit: Option[Long],
     maxSizeLimitOption: Option[String]
-  ): F[String]                                                                                  = run(XAdd(key, id, values, maxSizeLimit, maxSizeLimitOption))
-  override def xdel(key: String, id: String, ids: String*): F[Long]                             = run(XDel(key, id, ids.toVector))
-  override def xgroupCreate(key: String, group: String, id: String, mkstream: Boolean): F[Unit] = run(XGroupCreate(key, group, id, mkstream))
-  override def xgroupDelConsumer(key: String, group: String, consumer: String): F[Long]         = run(XGroupDelConsumer(key, group, consumer))
-  override def xgroupDestory(key: String, group: String): F[Long]                               = run(XGroupDestory(key, group))
-  override def xgroupSetId(key: String, group: String, id: String): F[Unit]                     = run(XGroupSetId(key, group, id))
-  override def xinfoStream(key: String): F[XInfoStreamResponse]                                 = run(XInfoStream(key))
-  override def xinfoGroups(key: String): F[Seq[XInfoGroupResponse]]                             = run(XInfoGroups(key))
-  override def xinfoConsumers(key: String, group: String): F[Seq[XInfoConsumerResponse]]        = run(XInfoConsumers(key, group))
-  override def xlen(key: String): F[Long]                                                       = run(XLen(key))
+  ): F[String]                                                                                                                    = run(XAdd(key, id, values, maxSizeLimit, maxSizeLimitOption))
+  override def xdel(key: String, id: String, ids: String*): F[Long]                                                               = run(XDel(key, id, ids.toVector))
+  override def xgroupCreate(key: String, group: String, id: String, mkstream: Boolean): F[Unit]                                   = run(XGroupCreate(key, group, id, mkstream))
+  override def xgroupDelConsumer(key: String, group: String, consumer: String): F[Long]                                           = run(XGroupDelConsumer(key, group, consumer))
+  override def xgroupDestory(key: String, group: String): F[Long]                                                                 = run(XGroupDestory(key, group))
+  override def xgroupSetId(key: String, group: String, id: String): F[Unit]                                                       = run(XGroupSetId(key, group, id))
+  override def xinfoStream(key: String): F[XInfoStreamResponse]                                                                   = run(XInfoStream(key))
+  override def xinfoGroups(key: String): F[Seq[XInfoGroupResponse]]                                                               = run(XInfoGroups(key))
+  override def xinfoConsumers(key: String, group: String): F[Seq[XInfoConsumerResponse]]                                          = run(XInfoConsumers(key, group))
+  override def xlen(key: String): F[Long]                                                                                         = run(XLen(key))
   override def xpending(
     key: String,
     group: String,
@@ -87,11 +87,11 @@ trait StreamC[F[_]] extends StreamCommands[F] { self: RunC[F] =>
     stop: String,
     count: Long,
     consumer: Option[String]
-  ): F[Seq[PendingMessage]] =
+  ): F[Seq[PendingMessage]]                                                                                                       =
     run(XPending(key, group, start, stop, count, consumer))
-  override def xpendingGroup(key: String, group: String): F[PendingSummary] =
+  override def xpendingGroup(key: String, group: String): F[PendingSummary]                                                       =
     run(XPendingGroup(key, group))
-  override def xrange(key: String, start: String, end: String, count: Option[Long]): F[Seq[StreamMessage]] =
+  override def xrange(key: String, start: String, end: String, count: Option[Long]): F[Seq[StreamMessage]]                        =
     run(XRange(key, start, end, count))
   override def xread(streams: Seq[(String, String)], count: Option[Long], block: Option[FiniteDuration]): F[Seq[ReadStreamReply]] =
     run(XRead(streams, count, block))
@@ -102,11 +102,11 @@ trait StreamC[F[_]] extends StreamCommands[F] { self: RunC[F] =>
     count: Option[Long],
     block: Option[FiniteDuration],
     noack: Boolean
-  ): F[Seq[ReadStreamReply]] =
+  ): F[Seq[ReadStreamReply]]                                                                                                      =
     run(XReadGroup(group, consumer, streams, count, block, noack))
-  override def xrevRange(key: String, end: String, start: String, count: Option[Long]): F[Seq[StreamMessage]] =
+  override def xrevRange(key: String, end: String, start: String, count: Option[Long]): F[Seq[StreamMessage]]                     =
     run(XRevRange(key, end, start, count))
-  override def xtrim(key: String, count: Long, option: Option[String]): F[Long] =
+  override def xtrim(key: String, count: Long, option: Option[String]): F[Long]                                                   =
     run(XTrim(key, count, option))
 }
 

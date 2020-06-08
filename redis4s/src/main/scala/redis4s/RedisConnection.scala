@@ -15,8 +15,8 @@ trait Connection[F[_]] {
 object Connection {
   private val logger = org.log4s.getLogger
 
-  def request[F[_], R, P](r: R)(conn: Connection[F])(
-    implicit M: MonadError[F, Throwable],
+  def request[F[_], R, P](r: R)(conn: Connection[F])(implicit
+    M: MonadError[F, Throwable],
     C: CommandCodec.Aux[R, P]
   ): F[P] = {
     val request = C.encodeCommand(r)
@@ -79,22 +79,21 @@ object RedisConnection {
 
         for {
           // watch all
-          _ <- watch.handleErrorWith(e => unwatch >> e.raiseError[F, Unit])
+          _     <- watch.handleErrorWith(e => unwatch >> e.raiseError[F, Unit])
           // send and receive responses
           _     <- socket.writeN(Chain.fromSeq(reqs).prepend(MULTI).append(EXEC))
           resps <- socket.readN(reqs.size + 2).map(_.toVector)
           // response for MULTI
-          _ <- resps.head.checkError.flatMap(_.checkStatus("OK")).leftMap(TransactionError(_)).liftTo[F]
+          _     <- resps.head.checkError.flatMap(_.checkStatus("OK")).leftMap(TransactionError(_)).liftTo[F]
           // response for QUEUED commands
-          _ <- resps
-                .slice(1, reqs.size + 1)
-                .traverse_(
-                  _.checkError.flatMap(_.checkStatus("QUEUED")).leftMap(TransactionError(_)).liftTo[F]
-                ) // check QUEUED commands
+          _     <- resps.slice(1, reqs.size + 1)
+                     .traverse_(
+                       _.checkError.flatMap(_.checkStatus("QUEUED")).leftMap(TransactionError(_)).liftTo[F]
+                     ) // check QUEUED commands
           // response for EXEC
           as <- resps.last.asOption.fold(TransactionError("Aborted").raiseError[F, Vector[RedisMessage]]) {
-                 _.asArrayOfSize(reqs.size).leftMap(TransactionError(_)).liftTo[F]
-               }
+                  _.asArrayOfSize(reqs.size).leftMap(TransactionError(_)).liftTo[F]
+                }
         } yield as
       }
 

@@ -16,7 +16,7 @@ trait ProtocolSocket[F[_], A] {
 }
 
 object ProtocolSocket {
-  private val logger = org.log4s.getLogger
+  private val logger                  = org.log4s.getLogger
   def pretty(bits: BitVector): String =
     bits.toByteVector.decodeUtf8.fold(_.toString, identity).replaceAll("\r\n", raw"\\r\\n")
 
@@ -50,10 +50,10 @@ object ProtocolSocket {
               case Attempt.Successful(DecodeResult(value, remainder)) =>
                 buffer += value
                 go(remainder, c - 1)
-              case Attempt.Failure(Err.InsufficientBits(_, _, _)) =>
+              case Attempt.Failure(Err.InsufficientBits(_, _, _))     =>
                 if (input.sizeLessThan(maxResponseSizeBytes * 8L)) go(input, 0)
                 else DecodeFailure(s"Max response size reached (${input.size})").asLeft
-              case Attempt.Failure(cause) =>
+              case Attempt.Failure(cause)                             =>
                 DecodeFailure(cause.messageWithContext).asLeft
             }
           }

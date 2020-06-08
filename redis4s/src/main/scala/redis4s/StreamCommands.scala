@@ -87,10 +87,11 @@ object StreamCommands {
   }
 
   object StreamMessage {
-    def decode(m: RedisMessage): Either[DecodeError, StreamMessage] = m.asArrayOfSize(2).flatMap {
-      case Vector(id, arr) =>
-        (id.asString, arr.asStringMap).mapN(StreamMessage.apply)
-    }
+    def decode(m: RedisMessage): Either[DecodeError, StreamMessage] =
+      m.asArrayOfSize(2).flatMap {
+        case Vector(id, arr) =>
+          (id.asString, arr.asStringMap).mapN(StreamMessage.apply)
+      }
 
     def decodeSeq(m: RedisMessage): Either[DecodeError, Seq[StreamMessage]] =
       m.asArray.flatMap {
@@ -131,7 +132,7 @@ object StreamCommands {
     implicit val codec: Aux[XAdd, String] = mk[XAdd, String] {
       case XAdd(key, id, values, maxSizeLimit, maxSizeLimitOption) =>
         val sizeLimit = for {
-          limit  <- maxSizeLimit
+          limit <- maxSizeLimit
           option = Chain.fromOption(maxSizeLimitOption)
         } yield Chain.one("MAXLEN") ++ option ++ Chain.one(limit.toString)
 

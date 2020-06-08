@@ -23,29 +23,32 @@ object FreeIO {
 
   type RCollect[F[_], A] = Const[Chain[Lift[F]], A]
 
-  def lioNat[F[_]: Concurrent]: RCommand ~> RIO[F, *] = new (RCommand ~> RIO[F, *]) {
-    override def apply[A](fa: RCommand[A]): RIO[F, A] = {
-      fa match {
-        case RCommand.C(r, codec) =>
-          val deferred = Deferred.unsafe[F, Either[RedisError, A]]
+  def lioNat[F[_]: Concurrent]: RCommand ~> RIO[F, *] =
+    new (RCommand ~> RIO[F, *]) {
+      override def apply[A](fa: RCommand[A]): RIO[F, A] = {
+        fa match {
+          case RCommand.C(r, codec) =>
+            val deferred = Deferred.unsafe[F, Either[RedisError, A]]
 
-          val op: RCmd[F, A] = RCmd[F, A](
-            codec.encodeCommand(r),
-            (a: RedisMessage) => {
-              deferred.complete(codec.decodeResponse(a))
-            },
-            deferred.get.flatMap(_.liftTo[F])
-          )
-          FreeApplicative.lift(op)
+            val op: RCmd[F, A] = RCmd[F, A](
+              codec.encodeCommand(r),
+              (a: RedisMessage) => {
+                deferred.complete(codec.decodeResponse(a))
+              },
+              deferred.get.flatMap(_.liftTo[F])
+            )
+            FreeApplicative.lift(op)
+        }
       }
     }
-  }
 
-  def collectNat[F[_]]: RCmd[F, *] ~> RCollect[F, *] = new (RCmd[F, *] ~> RCollect[F, *]) {
-    override def apply[A](fa: RCmd[F, A]): RCollect[F, A] = Const(Chain(Lift(fa.request, fa.complete)))
-  }
+  def collectNat[F[_]]: RCmd[F, *] ~> RCollect[F, *] =
+    new (RCmd[F, *] ~> RCollect[F, *]) {
+      override def apply[A](fa: RCmd[F, A]): RCollect[F, A] = Const(Chain(Lift(fa.request, fa.complete)))
+    }
 
-  def ioNat[F[_]]: RCmd[F, *] ~> F = new (RCmd[F, *] ~> F) {
-    override def apply[A](fa: RCmd[F, A]): F[A] = fa.get
-  }
+  def ioNat[F[_]]: RCmd[F, *] ~> F =
+    new (RCmd[F, *] ~> F) {
+      override def apply[A](fa: RCmd[F, A]): F[A] = fa.get
+    }
 }

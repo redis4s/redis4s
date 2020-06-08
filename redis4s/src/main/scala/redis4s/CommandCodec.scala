@@ -18,7 +18,7 @@ object CommandCodec {
   type Aux[R, P0] = CommandCodec[R] { type P = P0 }
 
   implicit class ops[R, P](private val codec: Aux[R, P]) extends AnyVal {
-    def encodeCommand(r: R): RedisMessage =
+    def encodeCommand(r: R): RedisMessage                      =
       RedisMessage.arr(codec.encode(r).toChain.toVector.map(RedisMessage.buf))
     def decodeResponse(r: RedisMessage): Either[RedisError, P] =
       r.checkError.flatMap(codec.decode)
@@ -92,7 +92,7 @@ object CommandCodec {
         case (name, opt) =>
           opt.fold(Chain.empty[ByteVector])(a => toArgs(a).prepend(name.bv))
       }
-    implicit def pair[A: Appendable]: Appendable[(A, A)] =
+    implicit def pair[A: Appendable]: Appendable[(A, A)]                  =
       mk[(A, A)] {
         case (a, b) => toArgs(a) ++ toArgs(b)
       }

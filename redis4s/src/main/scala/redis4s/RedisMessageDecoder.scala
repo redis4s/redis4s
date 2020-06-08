@@ -20,18 +20,19 @@ object RedisMessageDecoder {
         case x                => DecodeError.general(s"Status error, '$status' expected, got '$x'").asLeft
       }
 
-    def checkError: Either[ErrorResponse, RedisMessage] = message match {
-      case Error(message) => ErrorResponse(message).asLeft
-      case a              => a.asRight
-    }
+    def checkError: Either[ErrorResponse, RedisMessage] =
+      message match {
+        case Error(message) => ErrorResponse(message).asLeft
+        case a              => a.asRight
+      }
 
-    def asStatus: Either[DecodeError, String] =
+    def asStatus: Either[DecodeError, String]   =
       matchType("Status") { case Status(message) => message }
 
-    def asError: Either[DecodeError, String] =
+    def asError: Either[DecodeError, String]    =
       matchType("Error") { case Error(err) => err }
 
-    def asInteger: Either[DecodeError, Long] =
+    def asInteger: Either[DecodeError, Long]    =
       matchType("Integer") { case Integer(id) => id }
 
     def asBoolean: Either[DecodeError, Boolean] =
@@ -40,10 +41,10 @@ object RedisMessageDecoder {
     def asBytes: Either[DecodeError, ByteVector] =
       matchType("NonNull Bulk") { case Bulk(Some(value)) => value }
 
-    def asNull: Either[DecodeError, Unit] =
+    def asNull: Either[DecodeError, Unit]        =
       matchType("Empty Bulk") { case Bulk(None) => () }
 
-    def asNil: Either[DecodeError, Unit] =
+    def asNil: Either[DecodeError, Unit]         =
       matchType("Empty Arr") { case Arr(None) => () }
 
     def isNil: Boolean = {
@@ -53,22 +54,24 @@ object RedisMessageDecoder {
       }
     }
 
-    def asOption: Option[RedisMessage] = message match {
-      case Arr(None)  => none
-      case Bulk(None) => none
-      case a          => a.some
-    }
+    def asOption: Option[RedisMessage] =
+      message match {
+        case Arr(None)  => none
+        case Bulk(None) => none
+        case a          => a.some
+      }
 
     def asString: Either[DecodeError, String] =
       asBytes.flatMap(_.utf8)
 
     // sometimes we need to treat Nil as emtpy Arr
-    def nilAsEmpty: RedisMessage = message match {
-      case Arr(None) => arr(Vector.empty)
-      case a         => a
-    }
+    def nilAsEmpty: RedisMessage =
+      message match {
+        case Arr(None) => arr(Vector.empty)
+        case a         => a
+      }
 
-    def asArray: Either[DecodeError, Vector[RedisMessage]] =
+    def asArray: Either[DecodeError, Vector[RedisMessage]]               =
       matchType("NonEmptyArr") { case Arr(Some(as)) => as }
 
     def asArrayOfSize(n: Int): Either[DecodeError, Vector[RedisMessage]] =

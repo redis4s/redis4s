@@ -14,11 +14,12 @@ import scala.util.Try
 sealed trait RedisMessage
 object RedisMessage {
 
-  case class Status(message: String)                    extends RedisMessage // "+OK\r\n"
-  case class Error(message: String)                     extends RedisMessage // "-Error message\r\n"
-  case class Integer(i: Long)                           extends RedisMessage // ":15\r\n"
-  case class Bulk(message: Option[ByteVector])          extends RedisMessage // "$6\r\nfoobar\r\n"
-  case class Arr(message: Option[Vector[RedisMessage]]) extends RedisMessage // "*0\r\n" "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
+  case class Status(message: String)           extends RedisMessage // "+OK\r\n"
+  case class Error(message: String)            extends RedisMessage // "-Error message\r\n"
+  case class Integer(i: Long)                  extends RedisMessage // ":15\r\n"
+  case class Bulk(message: Option[ByteVector]) extends RedisMessage // "$6\r\nfoobar\r\n"
+  case class Arr(message: Option[Vector[RedisMessage]])
+      extends RedisMessage // "*0\r\n" "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
 
   def arr(as: Vector[RedisMessage]): Arr                = Arr(as.some)
   def status(str: String): Status                       = Status(str)
@@ -37,7 +38,7 @@ object RedisMessage {
   implicit class ops(private val r: RedisMessage) {
     final def prettyPrint: String = {
       r match {
-        case Bulk(Some(a)) =>
+        case Bulk(Some(a))   =>
           a.decodeUtf8.fold(_ => s"Binary(${a.size}))", s => s""""$s"""")
         case Bulk(None)      => s"Null"
         case Status(message) => s"Status($message)"

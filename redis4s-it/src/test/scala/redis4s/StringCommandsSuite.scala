@@ -25,9 +25,9 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.set("foo", "foobar")
       r <- redis.bitcount("foo", none)
-      _ = assertEquals(r, 26L)
+      _  = assertEquals(r, 26L)
       r <- redis.bitcount("foo", (0L, 0L).some)
-      _ = assertEquals(r, 4L)
+      _  = assertEquals(r, 4L)
     } yield ()
   }
 
@@ -37,7 +37,7 @@ object StringCommandsSuite extends ClientSuite {
       _ <- redis.set("bar", "0")
       _ <- redis.bitop(BitOps.AND, "baz", "foo", "bar")
       r <- redis.get("baz")
-      _ = assertEquals(r, "0".some)
+      _  = assertEquals(r, "0".some)
     } yield ()
   }
 
@@ -45,7 +45,7 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.set("foo", "k")
       r <- redis.bitpos("foo", 1)
-      _ = assertEquals(r, 1L)
+      _  = assertEquals(r, 1L)
     } yield ()
   }
 
@@ -54,10 +54,10 @@ object StringCommandsSuite extends ClientSuite {
       _ <- redis.del("foo")
       _ <- redis.incr("foo")
       r <- redis.get("foo")
-      _ = assertEquals(r, "1".some)
+      _  = assertEquals(r, "1".some)
       _ <- redis.decr("foo")
       r <- redis.get("foo")
-      _ = assertEquals(r, "0".some)
+      _  = assertEquals(r, "0".some)
     } yield ()
   }
 
@@ -67,10 +67,10 @@ object StringCommandsSuite extends ClientSuite {
       _ <- redis.incrBy("foo", 50)
       _ <- redis.decrBy("foo", 51)
       r <- redis.get("foo")
-      _ = assertEquals(r, "-1".some)
+      _  = assertEquals(r, "-1".some)
       _ <- redis.incrByFloat("foo", "1e2")
       r <- redis.get("foo")
-      _ = assertEquals(r, "99".some)
+      _  = assertEquals(r, "99".some)
     } yield ()
   }
 
@@ -78,7 +78,7 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.setBit("foo", 0L, 1)
       r <- redis.getBit("foo", 0L)
-      _ = assertEquals(r, 1L)
+      _  = assertEquals(r, 1L)
     } yield ()
   }
 
@@ -87,7 +87,7 @@ object StringCommandsSuite extends ClientSuite {
       _ <- redis.set("foo", "baz")
       _ <- redis.setRange("foo", 0, "bazqux")
       r <- redis.getRange("foo", 1, 3)
-      _ = assertEquals(r, "azq")
+      _  = assertEquals(r, "azq")
     } yield ()
   }
 
@@ -95,9 +95,9 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.set("foo", "baz")
       r <- redis.getSet("foo", "qux")
-      _ = assertEquals(r, "baz".some)
+      _  = assertEquals(r, "baz".some)
       r <- redis.get("foo")
-      _ = assertEquals(r, "qux".some)
+      _  = assertEquals(r, "qux".some)
     } yield ()
   }
 
@@ -105,7 +105,7 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.mset("a" -> "1", "b" -> "2", "c" -> "3")
       r <- redis.mget("a", "b", "c")
-      _ = assertEquals(r.unite, Vector("1", "2", "3"))
+      _  = assertEquals(r.unite, Vector("1", "2", "3"))
     } yield ()
   }
 
@@ -113,7 +113,7 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.set("foo", "baz")
       r <- redis.strlen("foo")
-      _ = assertEquals(r, 3L)
+      _  = assertEquals(r, 3L)
     } yield ()
   }
 
@@ -121,10 +121,10 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.setex("foo", 1, "bar")
       r <- redis.get("foo")
-      _ = assertEquals(r, "bar".some)
+      _  = assertEquals(r, "bar".some)
       _ <- Timer[IO].sleep(1.second)
       r <- redis.get("foo")
-      _ = assertEquals(r, none)
+      _  = assertEquals(r, none)
     } yield ()
   }
 
@@ -134,7 +134,7 @@ object StringCommandsSuite extends ClientSuite {
       _ <- redis.setnx("foo", "bar")
       _ <- redis.setnx("foo", "baz")
       r <- redis.get("foo")
-      _ = assertEquals(r, "bar".some)
+      _  = assertEquals(r, "bar".some)
     } yield ()
   }
 
@@ -144,7 +144,7 @@ object StringCommandsSuite extends ClientSuite {
       _ <- redis.del("bar")
       _ <- redis.msetnx("foo" -> "2", "bar" -> "3")
       r <- redis.mget("foo", "bar")
-      _ = assertEquals(r, Vector("1".some, none))
+      _  = assertEquals(r, Vector("1".some, none))
     } yield ()
   }
 
@@ -152,10 +152,10 @@ object StringCommandsSuite extends ClientSuite {
     for {
       _ <- redis.psetex("foo", 100, "1")
       r <- redis.get("foo")
-      _ = assertEquals(r, "1".some)
+      _  = assertEquals(r, "1".some)
       _ <- Timer[IO].sleep(100.millis)
       r <- redis.get("foo")
-      _ = assertEquals(r, none)
+      _  = assertEquals(r, none)
     } yield ()
   }
 }

@@ -6,10 +6,11 @@ import redis4s.CommandCodec.Aux
 trait CommandCodecSuite extends SimpleTestSuite {
   type Check[A] = (RedisMessage.Arr, Either[RedisError, A])
 
-  def newClient(reply: RedisMessage): RedisClient[Check] = new RedisC[Check] {
-    override def run[R, P](r: R)(implicit codec: Aux[R, P]): Check[P] =
-      (RedisMessage.arr(codec.encode(r).toChain.toVector.map(RedisMessage.buf)), codec.decode(reply))
-  }
+  def newClient(reply: RedisMessage): RedisClient[Check] =
+    new RedisC[Check] {
+      override def run[R, P](r: R)(implicit codec: Aux[R, P]): Check[P] =
+        (RedisMessage.arr(codec.encode(r).toChain.toVector.map(RedisMessage.buf)), codec.decode(reply))
+    }
 
   def given[P](
     name: String

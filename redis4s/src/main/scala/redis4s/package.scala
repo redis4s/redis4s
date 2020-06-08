@@ -5,8 +5,8 @@ object Order {
   case object ASC  extends Order
   case object DESC extends Order
 
-  def asc: Order  = ASC
-  def desc: Order = DESC
+  def asc: Order                                          = ASC
+  def desc: Order                                         = DESC
   @SuppressWarnings(Array("org.wartremover.warts.ToString"))
   implicit val appendable: CommandCodec.Appendable[Order] = CommandCodec.Appendable[String].xmap[Order](_.toString)
 }

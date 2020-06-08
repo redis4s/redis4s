@@ -23,16 +23,17 @@ case class Redis4sConfig[F[_]](
 )
 
 object Redis4sConfig {
-  def default[F[_]: Sync: ContextShift]: Redis4sConfig[F] = Redis4sConfig[F](
-    host = "localhost",
-    port = 6379,
-    db = 0,
-    auth = none,
-    socketGroup = newSocketGroup[F],
-    socketTimeout = 3.seconds,
-    readChunkSizeInBytes = 1024 * 1024,
-    maxResponseSizeInBytes = 10 * 1024 * 1024
-  )
+  def default[F[_]: Sync: ContextShift]: Redis4sConfig[F] =
+    Redis4sConfig[F](
+      host = "localhost",
+      port = 6379,
+      db = 0,
+      auth = none,
+      socketGroup = newSocketGroup[F],
+      socketTimeout = 3.seconds,
+      readChunkSizeInBytes = 1024 * 1024,
+      maxResponseSizeInBytes = 10 * 1024 * 1024
+    )
 
   def newSocketGroup[F[_]: Sync: ContextShift]: Resource[F, SocketGroup] = {
     for {
@@ -75,8 +76,8 @@ object Redis4s {
     clientPool: KeyPool[F, RequestKey, RedisConnection[F]]
   ): Connection[F] =
     new Connection[F] {
-      override def execute(req: RedisMessage): F[RedisMessage]                   = use(clientPool)(_.execute(req))
-      override def pipeline(reqs: Vector[RedisMessage]): F[Vector[RedisMessage]] = use(clientPool)(_.pipeline(reqs))
+      override def execute(req: RedisMessage): F[RedisMessage]                                                         = use(clientPool)(_.execute(req))
+      override def pipeline(reqs: Vector[RedisMessage]): F[Vector[RedisMessage]]                                       = use(clientPool)(_.pipeline(reqs))
       override def transact(watchKeys: Vector[RedisMessage.Bulk], reqs: Vector[RedisMessage]): F[Vector[RedisMessage]] =
         use(clientPool)(_.transact(watchKeys, reqs))
     }
@@ -85,19 +86,19 @@ object Redis4s {
     rc: Redis4sConfig[F]
   ): Resource[F, RedisConnection[F]] =
     for {
-      sg   <- rc.socketGroup
-      addr = new InetSocketAddress(rc.host, rc.port)
+      sg     <- rc.socketGroup
+      addr    = new InetSocketAddress(rc.host, rc.port)
       socket <- sg.client(
-                 addr,
-                 noDelay = true,
-                 sendBufferSize = rc.readChunkSizeInBytes,
-                 receiveBufferSize = rc.readChunkSizeInBytes
-               )
-      bvs = BitVectorSocket.wrap(socket, rc.socketTimeout)
-      ps  = ProtocolSocket.wrap[F, RedisMessage](bvs, rc.readChunkSizeInBytes, rc.maxResponseSizeInBytes)
-      c   = RedisConnection(ps)
-      _   <- Resource.liftF(rc.auth.traverse(Connection.authenticate(c, _)))
-      _   <- Resource.liftF(Connection.select(c, rc.db))
+                  addr,
+                  noDelay = true,
+                  sendBufferSize = rc.readChunkSizeInBytes,
+                  receiveBufferSize = rc.readChunkSizeInBytes
+                )
+      bvs     = BitVectorSocket.wrap(socket, rc.socketTimeout)
+      ps      = ProtocolSocket.wrap[F, RedisMessage](bvs, rc.readChunkSizeInBytes, rc.maxResponseSizeInBytes)
+      c       = RedisConnection(ps)
+      _      <- Resource.liftF(rc.auth.traverse(Connection.authenticate(c, _)))
+      _      <- Resource.liftF(Connection.select(c, rc.db))
     } yield c
 
   def simple[F[_]: ConcurrentEffect](connection: Connection[F]): RedisClient[F] = SimpleClient.wrap(connection)

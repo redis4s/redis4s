@@ -9,7 +9,7 @@ package object free {
 
 package free {
   sealed trait RCommand[A]
-  object RCommand {
+  object RCommand   {
     final case class C[R, A](r: R, codec: CommandCodec.Aux[R, A]) extends RCommand[A]
   }
 

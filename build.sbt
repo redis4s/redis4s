@@ -16,9 +16,9 @@ lazy val commonSettings = Seq(
   fork in run := true,
   Test / fork := true,
   parallelExecution in Test := false,
-  addCompilerPlugin("org.typelevel"    % "kind-projector"      % "0.11.0" cross CrossVersion.full),
-  addCompilerPlugin("com.olegpy"       %% "better-monadic-for" % "0.3.1"),
-  addCompilerPlugin("com.github.cb372" % "scala-typed-holes"   % "0.1.3.3" cross CrossVersion.full),
+  addCompilerPlugin("org.typelevel"    % "kind-projector"     % "0.11.0" cross CrossVersion.full),
+  addCompilerPlugin("com.olegpy"      %% "better-monadic-for" % "0.3.1"),
+  addCompilerPlugin("com.github.cb372" % "scala-typed-holes"  % "0.1.3.3" cross CrossVersion.full),
   wartremoverErrors := Nil,
   testFrameworks += new TestFramework("minitest.runner.Framework"),
   version ~= (_.replace('+', '-')),
@@ -31,7 +31,7 @@ lazy val testDeps = Seq(
       "com.codecommit"    %% "cats-effect-testing-minitest" % "0.4.0",
       "io.chrisdavenport" %% "log4cats-slf4j"               % "1.1.1",
       "io.monix"          %% "minitest"                     % "2.8.2",
-      "ch.qos.logback"    % "logback-classic"               % "1.2.3"
+      "ch.qos.logback"     % "logback-classic"              % "1.2.3"
     )
   }
 )
