@@ -6,7 +6,7 @@ import cats.implicits._
 
 import scala.concurrent.duration._
 
-object GenericCommandSuit extends ClientSuite {
+object GenericCommandSuite extends ClientSuite {
   test("type") {
     reset()
     for {

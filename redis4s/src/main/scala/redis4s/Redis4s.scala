@@ -112,14 +112,14 @@ object Redis4s {
     for {
       sg <- rc.socketGroup
       addr       = new InetSocketAddress(rc.host, rc.port)
-      socket    <- sg.client(
+      rawSocket <- sg.client(
                      addr,
                      noDelay = true,
                      sendBufferSize = rc.readChunkSizeInBytes,
                      receiveBufferSize = rc.readChunkSizeInBytes
                    )
-      tlsSocket <- connectTls(socket)
-      bvs        = BitVectorSocket.wrap(tlsSocket, rc.socketTimeout)
+      socket    <- connectTls(rawSocket)
+      bvs        = BitVectorSocket.wrap(socket, rc.socketTimeout)
       ps         = ProtocolSocket.wrap[F, RedisMessage](bvs, rc.readChunkSizeInBytes, rc.maxResponseSizeInBytes)
       c          = RedisConnection(ps)
       _         <- Resource.liftF(rc.auth.traverse(Connection.authenticate(c, _)))
