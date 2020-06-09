@@ -19,12 +19,22 @@ object RedisTest {
     .default[IO]
     .copy(socketGroup = Resource.liftF(socketGroup.pure[IO]))
 
+  val tlsConfig: Redis4sConfig[IO] =
+    config.copy(tlsConfig = Redis4sConfig.insecureTLSConfig[IO](blocker).some)
+
   def allocate[A](resource: Resource[IO, A]): A = resource.allocated.unsafeRunSync()._1
 
   def newClient(): RedisClient[IO] =
     allocate {
       Redis4s
         .connection(config)
+        .map(Redis4s.simple[IO](_))
+    }
+
+  def newTLSClient(): RedisClient[IO] =
+    allocate {
+      Redis4s
+        .connection(tlsConfig)
         .map(Redis4s.simple[IO](_))
     }
 

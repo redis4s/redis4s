@@ -43,12 +43,13 @@ object Redis4sConfig {
       maxResponseSizeInBytes = 10 * 1024 * 1024
     )
 
-  def defaultWithInsecureTLS[F[_]: Sync: ContextShift](blocker: Blocker): Redis4sConfig[F] = {
-    val tlsConfig = Resource.liftF(TLSContext.insecure[F](blocker)).map { context =>
-      Redis4sTLSConfig(context, TLSParameters.Default)
-    }
-    default[F].copy(tlsConfig = tlsConfig.some)
-  }
+  def defaultWithInsecureTLS[F[_]: Sync: ContextShift](blocker: Blocker): Redis4sConfig[F] =
+    default[F].copy(tlsConfig = insecureTLSConfig[F](blocker).some)
+
+  def insecureTLSConfig[F[_]: Sync: ContextShift](blocker: Blocker): Resource[F, Redis4sTLSConfig] =
+    Resource
+      .liftF(TLSContext.insecure[F](blocker))
+      .map(ctx => Redis4sTLSConfig(ctx, TLSParameters.Default))
 
   def newSocketGroup[F[_]: Sync: ContextShift]: Resource[F, SocketGroup] = {
     for {
