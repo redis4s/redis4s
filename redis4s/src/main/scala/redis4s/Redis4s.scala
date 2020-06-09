@@ -4,12 +4,18 @@ import java.net.InetSocketAddress
 
 import cats.implicits._
 import cats.effect._
-import fs2.io.tcp.SocketGroup
+import fs2.io.tcp._
+import fs2.io.tls.{TLSContext, TLSParameters}
 import io.chrisdavenport.keypool.KeyPool
 import redis4s.Pool.{RequestKey, use}
 import redis4s.free.RedisSession
 
 import scala.concurrent.duration._
+
+case class Redis4sTLSConfig(
+  context: TLSContext,
+  params: TLSParameters
+)
 
 case class Redis4sConfig[F[_]](
   host: String,
@@ -18,6 +24,7 @@ case class Redis4sConfig[F[_]](
   auth: Option[String],
   socketGroup: Resource[F, SocketGroup],
   socketTimeout: FiniteDuration,
+  tlsConfig: Option[Resource[F, Redis4sTLSConfig]],
   readChunkSizeInBytes: Int,
   maxResponseSizeInBytes: Int
 )
@@ -31,9 +38,17 @@ object Redis4sConfig {
       auth = none,
       socketGroup = newSocketGroup[F],
       socketTimeout = 3.seconds,
+      tlsConfig = none,
       readChunkSizeInBytes = 1024 * 1024,
       maxResponseSizeInBytes = 10 * 1024 * 1024
     )
+
+  def defaultWithInsecureTLS[F[_]: Sync: ContextShift](blocker: Blocker): Redis4sConfig[F] = {
+    val tlsConfig = Resource.liftF(TLSContext.insecure[F](blocker)).map { context =>
+      Redis4sTLSConfig(context, TLSParameters.Default)
+    }
+    default[F].copy(tlsConfig = tlsConfig.some)
+  }
 
   def newSocketGroup[F[_]: Sync: ContextShift]: Resource[F, SocketGroup] = {
     for {
@@ -84,7 +99,14 @@ object Redis4s {
 
   def connection[F[_]: ConcurrentEffect: ContextShift: Timer](
     rc: Redis4sConfig[F]
-  ): Resource[F, RedisConnection[F]] =
+  ): Resource[F, RedisConnection[F]] = {
+    val connectTls = (socket: Socket[F]) => {
+      rc.tlsConfig.fold(Resource.liftF(socket.pure[F])) {
+        _.flatMap { case Redis4sTLSConfig(context, params) =>
+          context.client(socket, params)
+        }
+      }
+    }
     for {
       sg     <- rc.socketGroup
       addr    = new InetSocketAddress(rc.host, rc.port)
@@ -94,12 +116,14 @@ object Redis4s {
                   sendBufferSize = rc.readChunkSizeInBytes,
                   receiveBufferSize = rc.readChunkSizeInBytes
                 )
-      bvs     = BitVectorSocket.wrap(socket, rc.socketTimeout)
+      tlsSocket <- connectTls(socket)
+      bvs     = BitVectorSocket.wrap(tlsSocket, rc.socketTimeout)
       ps      = ProtocolSocket.wrap[F, RedisMessage](bvs, rc.readChunkSizeInBytes, rc.maxResponseSizeInBytes)
       c       = RedisConnection(ps)
       _      <- Resource.liftF(rc.auth.traverse(Connection.authenticate(c, _)))
       _      <- Resource.liftF(Connection.select(c, rc.db))
     } yield c
+  }
 
   def simple[F[_]: ConcurrentEffect](connection: Connection[F]): RedisClient[F] = SimpleClient.wrap(connection)
 
