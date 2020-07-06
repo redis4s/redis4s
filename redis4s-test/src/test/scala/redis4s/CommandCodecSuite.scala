@@ -12,7 +12,7 @@ trait CommandCodecSuite extends SimpleTestSuite {
         (RedisMessage.arr(codec.encode(r).toChain.toVector.map(RedisMessage.buf)), codec.decode(reply))
     }
 
-  def given[P](
+  def sendRecv[P](
     name: String
   )(reply: RedisMessage)(cmd: RedisClient[Check] => Check[P])(assertions: Check[P] => Unit): Unit = {
     test(name) {

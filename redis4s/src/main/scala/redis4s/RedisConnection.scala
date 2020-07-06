@@ -86,7 +86,8 @@ object RedisConnection {
           // response for MULTI
           _     <- resps.head.checkError.flatMap(_.checkStatus("OK")).leftMap(TransactionError(_)).liftTo[F]
           // response for QUEUED commands
-          _     <- resps.slice(1, reqs.size + 1)
+          _     <- resps
+                     .slice(1, reqs.size + 1)
                      .traverse_(
                        _.checkError.flatMap(_.checkStatus("QUEUED")).leftMap(TransactionError(_)).liftTo[F]
                      ) // check QUEUED commands
