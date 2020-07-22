@@ -29,7 +29,7 @@ lazy val commonSettings = Seq(
 lazy val testDeps = Seq(
   libraryDependencies ++= {
     Seq(
-      "com.codecommit"    %% "cats-effect-testing-minitest" % "0.4.0",
+      "com.codecommit"    %% "cats-effect-testing-minitest" % "0.4.1",
       "io.chrisdavenport" %% "log4cats-slf4j"               % "1.1.1",
       "io.monix"          %% "minitest"                     % "2.8.2",
       "ch.qos.logback"     % "logback-classic"              % "1.2.3"
