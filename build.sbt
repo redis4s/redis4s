@@ -23,7 +23,9 @@ lazy val commonSettings = Seq(
   wartremoverErrors := Nil,
   testFrameworks += new TestFramework("minitest.runner.Framework"),
   version ~= (_.replace('+', '-')),
-  dynver ~= (_.replace('+', '-'))
+  dynver ~= (_.replace('+', '-')),
+  publishTo := Some("Github Package Registry" at "https://maven.pkg.github.com/redis4s/redis4s"),
+  credentials += Credentials("GitHub Package Registry", "maven.pkg.github.com", "redis4s", scala.sys.env.getOrElse("GITHUB_TOKEN", ""))
 )
 
 lazy val testDeps = Seq(
