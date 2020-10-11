@@ -26,23 +26,21 @@ object RedisSession {
         Concurrent[F]
           .delay(a.foldMap(lioNat))
           .map(_.foldMap(nat))
-          .flatMap {
-            case Tuple2K(log, fa) =>
-              val lifted    = log.getConst.toVector
-              val requests  = lifted.map(_.request)
-              val callbacks = lifted.map(_.complete)
-              if (logger.isTraceEnabled) {
-                requests.foreach(r => logger.trace(s"-> [P ${requests.size}] ${r.show}"))
-              }
-              conn
-                .pipeline(requests)
-                .flatMap(
-                  _.zip(callbacks).traverse_ {
-                    case (m, f) =>
-                      logger.trace(s"<- [P ${requests.size}] ${m.show}")
-                      f(m)
-                  }
-                ) >> fa
+          .flatMap { case Tuple2K(log, fa) =>
+            val lifted    = log.getConst.toVector
+            val requests  = lifted.map(_.request)
+            val callbacks = lifted.map(_.complete)
+            if (logger.isTraceEnabled) {
+              requests.foreach(r => logger.trace(s"-> [P ${requests.size}] ${r.show}"))
+            }
+            conn
+              .pipeline(requests)
+              .flatMap(
+                _.zip(callbacks).traverse_ { case (m, f) =>
+                  logger.trace(s"<- [P ${requests.size}] ${m.show}")
+                  f(m)
+                }
+              ) >> fa
           }
       }
 
@@ -50,22 +48,21 @@ object RedisSession {
         Concurrent[F]
           .delay(a.foldMap(lioNat))
           .map(_.foldMap(nat))
-          .flatMap {
-            case Tuple2K(log, fa) =>
-              val lifted    = log.getConst.toVector
-              val requests  = lifted.map(_.request)
-              val callbacks = lifted.map(_.complete)
-              if (requests.isEmpty) fa // `callbacks` should be empty too
-              else {
-                conn
-                  .transact(watchKeys.map(RedisMessage.string), requests)
-                  .map(_.zip(callbacks))
-                  .flatMap {
-                    _.traverse_ {
-                      case (m, f) => f(m)
-                    } >> fa
-                  }
-              }
+          .flatMap { case Tuple2K(log, fa) =>
+            val lifted    = log.getConst.toVector
+            val requests  = lifted.map(_.request)
+            val callbacks = lifted.map(_.complete)
+            if (requests.isEmpty) fa // `callbacks` should be empty too
+            else {
+              conn
+                .transact(watchKeys.map(RedisMessage.string), requests)
+                .map(_.zip(callbacks))
+                .flatMap {
+                  _.traverse_ { case (m, f) =>
+                    f(m)
+                  } >> fa
+                }
+            }
           }
       }
     }

@@ -103,14 +103,13 @@ object Redis4s {
   ): Resource[F, RedisConnection[F]] = {
     val connectTls = (socket: Socket[F]) => {
       rc.tlsConfig.fold(Resource.liftF(socket.pure[F])) {
-        _.flatMap {
-          case Redis4sTLSConfig(context, params) =>
-            context.client(socket, params)
+        _.flatMap { case Redis4sTLSConfig(context, params) =>
+          context.client(socket, params)
         }
       }
     }
     for {
-      sg <- rc.socketGroup
+      sg        <- rc.socketGroup
       addr       = new InetSocketAddress(rc.host, rc.port)
       rawSocket <- sg.client(
                      addr,

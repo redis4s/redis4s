@@ -96,15 +96,15 @@ object RedisMessageDecoder {
 
     def asMap: Either[DecodeError, Map[String, RedisMessage]] =
       asPairs.flatMap(
-        _.traverse {
-          case (a, b) => a.asString.map(_ -> b)
+        _.traverse { case (a, b) =>
+          a.asString.map(_ -> b)
         }.map(_.toMap)
       )
 
     def asStringMap: Either[DecodeError, Map[String, String]] =
       asPairs.flatMap(
-        _.traverse {
-          case (a, b) => (a.asString, b.asString).tupled
+        _.traverse { case (a, b) =>
+          (a.asString, b.asString).tupled
         }.map(_.toMap)
       )
   }

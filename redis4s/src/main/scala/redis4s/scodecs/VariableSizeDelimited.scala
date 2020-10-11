@@ -18,8 +18,8 @@ class VariableSizeDelimited[A](wrapped: Codec[A]) extends Codec[A] {
   override def sizeBound: SizeBound = wrapped.sizeBound
 
   override def decode(bits: BitVector): Attempt[DecodeResult[A]] = {
-    wrapped.decode(bits).recoverWith {
-      case _ => Attempt.Failure(Err.insufficientBits(bits.size + 1, bits.size))
+    wrapped.decode(bits).recoverWith { case _ =>
+      Attempt.Failure(Err.insufficientBits(bits.size + 1, bits.size))
     }
   }
 }

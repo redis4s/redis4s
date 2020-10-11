@@ -1,10 +1,11 @@
-.idea/
-target/
-.metals
 *.iml
 *.rdb
-.vscode
 .bloop
-out/
+.bsp
+.idea/
+.metals
+.vscode
 dumps/
+out/
 project/metals.sbt
+target/

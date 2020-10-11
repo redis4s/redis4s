@@ -39,13 +39,12 @@ class OptionalVectorCodec[A](countCodec: Codec[Int], valueCodec: Codec[A]) exten
   }
 
   override def decode(bits: BitVector): Attempt[DecodeResult[Option[Vector[A]]]] = {
-    countCodec.decode(bits).flatMap {
-      case DecodeResult(n, bits0) =>
-        if (n < 0) Attempt.successful(DecodeResult(none[Vector[A]], bits0))
-        else if (n == 0) Attempt.successful(DecodeResult(Vector.empty[A].some, bits0))
-        else {
-          decodeN(bits0, n).map(_.map(_.some))
-        }
+    countCodec.decode(bits).flatMap { case DecodeResult(n, bits0) =>
+      if (n < 0) Attempt.successful(DecodeResult(none[Vector[A]], bits0))
+      else if (n == 0) Attempt.successful(DecodeResult(Vector.empty[A].some, bits0))
+      else {
+        decodeN(bits0, n).map(_.map(_.some))
+      }
     }
   }
 }

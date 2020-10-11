@@ -139,9 +139,8 @@ object GenericCommands {
           .append(s.`type`.as("TYPE"))
           .append(s.`type`)
       } {
-        _.asArrayOfSize(2).flatMap {
-          case Vector(id, keys) =>
-            (id.asString, keys.asArray.flatMap(_.traverse(_.asString))).mapN(ScanResult)
+        _.asArrayOfSize(2).flatMap { case Vector(id, keys) =>
+          (id.asString, keys.asArray.flatMap(_.traverse(_.asString))).mapN(ScanResult)
         }
       }
   }

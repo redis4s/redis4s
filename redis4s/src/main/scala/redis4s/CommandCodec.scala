@@ -88,13 +88,12 @@ object CommandCodec {
 
   trait Appendable2 { self: Appendable0 =>
     implicit def optional[A: Appendable]: Appendable[(String, Option[A])] =
-      mk[(String, Option[A])] {
-        case (name, opt) =>
-          opt.fold(Chain.empty[ByteVector])(a => toArgs(a).prepend(name.bv))
+      mk[(String, Option[A])] { case (name, opt) =>
+        opt.fold(Chain.empty[ByteVector])(a => toArgs(a).prepend(name.bv))
       }
     implicit def pair[A: Appendable]: Appendable[(A, A)]                  =
-      mk[(A, A)] {
-        case (a, b) => toArgs(a) ++ toArgs(b)
+      mk[(A, A)] { case (a, b) =>
+        toArgs(a) ++ toArgs(b)
       }
   }
 }

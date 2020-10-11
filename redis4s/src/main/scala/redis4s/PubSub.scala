@@ -40,9 +40,8 @@ object PubSub {
   case class Message(channel: String, message: String)
   object Message {
     def decode(a: RedisMessage): Either[DecodeError, Message] = {
-      a.asArrayOfSize(2).flatMap {
-        case Vector(ch, msg) =>
-          (ch.asString, msg.asString).mapN(Message.apply)
+      a.asArrayOfSize(2).flatMap { case Vector(ch, msg) =>
+        (ch.asString, msg.asString).mapN(Message.apply)
       }
     }
   }

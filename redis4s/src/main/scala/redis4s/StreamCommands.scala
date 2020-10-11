@@ -69,28 +69,25 @@ object StreamCommands {
 
   object PendingSummary {
     def decode(m: RedisMessage): Either[DecodeError, PendingSummary] = {
-      m.asArrayOfSize(4).flatMap {
-        case Vector(total, start, end, details) =>
-          val parsedDetails = details.asArray
-            .flatMap {
-              _.traverse {
-                _.asArrayOfSize(2).flatMap {
-                  case Vector(k, v) =>
-                    (k.asString, v.asString.flatMap(n => DecodeError.guard(n.toLong))).tupled
-                }
+      m.asArrayOfSize(4).flatMap { case Vector(total, start, end, details) =>
+        val parsedDetails = details.asArray
+          .flatMap {
+            _.traverse {
+              _.asArrayOfSize(2).flatMap { case Vector(k, v) =>
+                (k.asString, v.asString.flatMap(n => DecodeError.guard(n.toLong))).tupled
               }
             }
-            .map(_.toMap)
-          (total.asInteger, start.asString, end.asString, parsedDetails).mapN(PendingSummary.apply)
+          }
+          .map(_.toMap)
+        (total.asInteger, start.asString, end.asString, parsedDetails).mapN(PendingSummary.apply)
       }
     }
   }
 
   object StreamMessage {
     def decode(m: RedisMessage): Either[DecodeError, StreamMessage] =
-      m.asArrayOfSize(2).flatMap {
-        case Vector(id, arr) =>
-          (id.asString, arr.asStringMap).mapN(StreamMessage.apply)
+      m.asArrayOfSize(2).flatMap { case Vector(id, arr) =>
+        (id.asString, arr.asStringMap).mapN(StreamMessage.apply)
       }
 
     def decodeSeq(m: RedisMessage): Either[DecodeError, Seq[StreamMessage]] =
@@ -101,19 +98,17 @@ object StreamCommands {
 
   object PendingMessage {
     def decode(m: RedisMessage): Either[DecodeError, PendingMessage] = {
-      m.asArrayOfSize(4).flatMap {
-        case Vector(id, consumer, elapsedMillis, numDelivers) =>
-          (id.asString, consumer.asString, elapsedMillis.asInteger, numDelivers.asInteger).mapN(PendingMessage.apply)
+      m.asArrayOfSize(4).flatMap { case Vector(id, consumer, elapsedMillis, numDelivers) =>
+        (id.asString, consumer.asString, elapsedMillis.asInteger, numDelivers.asInteger).mapN(PendingMessage.apply)
       }
     }
   }
 
   object ReadStreamReply {
     def decode(m: RedisMessage): Either[DecodeError, ReadStreamReply] =
-      m.asArrayOfSize(2).flatMap {
-        case Vector(stream, messages) =>
-          val messages0 = messages.asArray.flatMap(_.traverse(StreamMessage.decode))
-          (stream.asString, messages0).mapN(ReadStreamReply.apply)
+      m.asArrayOfSize(2).flatMap { case Vector(stream, messages) =>
+        val messages0 = messages.asArray.flatMap(_.traverse(StreamMessage.decode))
+        (stream.asString, messages0).mapN(ReadStreamReply.apply)
       }
 
     def decodeSeq(m: RedisMessage): Either[DecodeError, Seq[ReadStreamReply]] =
@@ -122,9 +117,8 @@ object StreamCommands {
   }
 
   object XAck {
-    implicit val codec: Aux[XAck, Long] = mk[XAck, Long] {
-      case XAck(key, group, id, ids) =>
-        cmd("XACK", key, group, id).append(ids)
+    implicit val codec: Aux[XAck, Long] = mk[XAck, Long] { case XAck(key, group, id, ids) =>
+      cmd("XACK", key, group, id).append(ids)
     }(_.asInteger)
   }
 
@@ -146,9 +140,8 @@ object StreamCommands {
 
   object XTrim {
     implicit val codec: Aux[XTrim, Long] =
-      mk[XTrim, Long] {
-        case XTrim(key, count, option) =>
-          cmd("XTRIM", key, "MAXLEN").append(option).append(count.toString)
+      mk[XTrim, Long] { case XTrim(key, count, option) =>
+        cmd("XTRIM", key, "MAXLEN").append(option).append(count.toString)
       } {
         _.asInteger
       }
@@ -156,9 +149,8 @@ object StreamCommands {
 
   object XDel {
     implicit val codec: Aux[XDel, Long] =
-      mk[XDel, Long] {
-        case XDel(key, id, ids) =>
-          cmd("XDEL", key, id).append(ids)
+      mk[XDel, Long] { case XDel(key, id, ids) =>
+        cmd("XDEL", key, id).append(ids)
       }(_.asInteger)
   }
 
@@ -178,10 +170,9 @@ object StreamCommands {
 
   object XRevRange {
     implicit val codec: Aux[XRevRange, Seq[StreamMessage]] =
-      mk[XRevRange, Seq[StreamMessage]] {
-        case XRevRange(key, end, start, count) =>
-          cmd("XREVRANGE", key, start, end)
-            .append("COUNT" -> count)
+      mk[XRevRange, Seq[StreamMessage]] { case XRevRange(key, end, start, count) =>
+        cmd("XREVRANGE", key, start, end)
+          .append("COUNT" -> count)
       }(StreamMessage.decodeSeq)
   }
 

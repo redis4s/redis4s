@@ -10,21 +10,18 @@ object StringCommandCodecSuite extends CommandCodecSuite {
   def assertEq(a: RedisMessage, b: RedisMessage): Unit =
     assert(a == b, s"Received ${a.prettyPrint} != expected ${b.prettyPrint}")
 
-  sendRecv("empty GET")(`null`)(_.get("foo")) {
-    case (req, resp) =>
-      assertEq(req, cmd("GET", "foo"))
-      assertEquals(resp, none[String].asRight)
+  sendRecv("empty GET")(`null`)(_.get("foo")) { case (req, resp) =>
+    assertEq(req, cmd("GET", "foo"))
+    assertEquals(resp, none[String].asRight)
   }
 
-  sendRecv("GET")(string("bar"))(_.get("baz")) {
-    case (req, resp) =>
-      assertEq(req, cmd("GET", "baz"))
-      assertEquals(resp, "bar".some.asRight)
+  sendRecv("GET")(string("bar"))(_.get("baz")) { case (req, resp) =>
+    assertEq(req, cmd("GET", "baz"))
+    assertEquals(resp, "bar".some.asRight)
   }
 
-  sendRecv("SET")(status("OK"))(_.set("foo", "bar", 50.seconds, SetModifier.XX.some)) {
-    case (req, resp) =>
-      assertEq(req, cmd("SET", "foo", "bar", "PX", "50000", "XX"))
-      assertEquals(resp, ().asRight)
+  sendRecv("SET")(status("OK"))(_.set("foo", "bar", 50.seconds, SetModifier.XX.some)) { case (req, resp) =>
+    assertEq(req, cmd("SET", "foo", "bar", "PX", "50000", "XX"))
+    assertEquals(resp, ().asRight)
   }
 }
