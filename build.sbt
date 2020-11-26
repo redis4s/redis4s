@@ -56,7 +56,7 @@ lazy val redis4s = project
         "org.tpolecat"      %% "natchez-core"  % "0.0.13",
         "co.fs2"            %% "fs2-io"        % "2.4.5",
         "co.fs2"            %% "fs2-core"      % "2.4.5",
-        "org.typelevel"     %% "cats-free"     % "2.2.0",
+        "org.typelevel"     %% "cats-free"     % "2.3.0",
         "org.scodec"        %% "scodec-core"   % "1.11.7",
         "io.chrisdavenport" %% "keypool"       % "0.2.0"
       )
