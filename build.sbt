@@ -37,8 +37,8 @@ lazy val testDeps = Seq(
   libraryDependencies ++= {
     Seq(
       "com.codecommit"    %% "cats-effect-testing-minitest" % "0.5.2",
-      "org.typelevel"     %% "log4cats-slf4j"               % "1.2.2",
-      "io.monix"          %% "minitest"                     % "2.9.3",
+      "org.typelevel"     %% "log4cats-slf4j"               % "1.2.0",
+      "io.monix"          %% "minitest"                     % "2.9.4",
       "ch.qos.logback"     % "logback-classic"              % "1.2.3"
     )
   }
@@ -52,11 +52,11 @@ lazy val redis4s = project
     libraryDependencies ++= {
       Seq(
         "org.log4s"         %% "log4s"         % "1.9.0",
-        "org.typelevel"     %% "log4cats-core" % "1.2.2",
-        "org.tpolecat"      %% "natchez-core"  % "0.0.20",
+        "org.typelevel"     %% "log4cats-core" % "1.2.0",
+        "org.tpolecat"      %% "natchez-core"  % "0.0.22",
         "co.fs2"            %% "fs2-io"        % "2.5.3",
         "co.fs2"            %% "fs2-core"      % "2.5.3",
-        "org.typelevel"     %% "cats-free"     % "2.4.2",
+        "org.typelevel"     %% "cats-free"     % "2.5.0",
         "org.scodec"        %% "scodec-core"   % "1.11.7",
         "io.chrisdavenport" %% "keypool"       % "0.2.0"
       )
