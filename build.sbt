@@ -51,7 +51,7 @@ lazy val redis4s = project
   .settings(
     libraryDependencies ++= {
       Seq(
-        "org.log4s"         %% "log4s"         % "1.9.0",
+        "org.log4s"         %% "log4s"         % "1.10.0",
         "org.typelevel"     %% "log4cats-core" % "1.2.0",
         "org.tpolecat"      %% "natchez-core"  % "0.0.22",
         "co.fs2"            %% "fs2-io"        % "2.5.3",
