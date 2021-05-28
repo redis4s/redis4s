@@ -8,8 +8,8 @@ lazy val root = project
 
 lazy val commonSettings = Seq(
   organization := "com.github.redis4s",
-  scalaVersion := "2.12.10",
-  crossScalaVersions := List("2.12.10", "2.13.1"),
+  scalaVersion := "2.12.14",
+  crossScalaVersions := List("2.12.14", "2.13.1"),
   scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-warnings"),
   publish / skip := true,
   scalafmtOnCompile := true,
